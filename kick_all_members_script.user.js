@@ -4,6 +4,7 @@
 // @description  Kick all members from your steam group. Script starts kicking instantly after opening a page!
 // @author       Lite_OnE
 // @match        http://steamcommunity.com/*/*/membersManage
+// @downloadURL  https://gist.github.com/LiteOnE/fc601234a3cc01bfa5c75fdff8b61b94/raw/kick_all_members_script.js
 // @grant        none
 // ==/UserScript==
 
