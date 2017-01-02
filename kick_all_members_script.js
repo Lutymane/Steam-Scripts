@@ -1,6 +1,5 @@
 // ==UserScript==
 // @name         Kick all members
-// @namespace    http://tampermonkey.net/
 // @version      2.0
 // @description  Kick all members from your steam group. Script starts kicking instantly after opening a page!
 // @author       Lite_OnE
