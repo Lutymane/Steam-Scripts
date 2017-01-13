@@ -2,6 +2,7 @@
 // @name         Extended Choosing of AppIDs for statuses in Steam activity feed 
 // @namespace    http://tampermonkey.net/
 // @version      1.1
+// @updateURL    https://github.com/LiteOnE/steam_scripts/raw/master/post_status_for_any_app_steam.user.js
 // @description  This script allows you posting statuses about apps using their IDs
 // @author       Lite_OnE
 // @match        http://steamcommunity.com/*/*/home/
