@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Steam Activity Feed
 // @namespace    http://tampermonkey.net/
-// @version      0.3(Beta)
+// @version      0.3
 // @description  This script allows you posting statuses about apps using their IDs. Also you can now rate up all posts in your activity feed in 2 clicks.
 // @author       Lite_OnE
 // @match        http://steamcommunity.com/*/*/home/
