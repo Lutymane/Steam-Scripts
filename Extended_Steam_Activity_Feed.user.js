@@ -22,7 +22,7 @@ unsafeWindow.PostStatus = function () {
 
 unsafeWindow.init_RateUpEvrthng = function() {
     if (confirm('Click "Yes" to start rating up everything')) {
-        m_RUD = ShowBlockingWaitDialog("Executing", "Rated up: " + i + " posts of " + n);
+        m_RUD = ShowBlockingWaitDialog("Executing", "Rating up");
         n = $('[id*="vote_up_"]').length;
         RateUpEvrthng(i);
     }
@@ -31,15 +31,12 @@ unsafeWindow.init_RateUpEvrthng = function() {
 function RateUpEvrthng (i){
     if (i<n){
         eval($('[id*="vote_up_"]:eq(' + i + ')').attr('onclick').split(' ')[1]);
-        m_RUD.Dismiss();
-        m_RUD = ShowBlockingWaitDialog("Executing", "Rated up: " + i+1 + " posts of " + n);
         i++;
         RateUpEvrthng(i);
     }else{
-        //$.ajax({url : g_BlotterNextLoadURL, success: alert('0')})
         $("html, body").scrollTop($(document).height());
         setTimeout(function (){
-            if (confirm('All posts on this page are rated up! Want to process next page?')){
+            if (confirm('All posts on this page are rated up! Do you want to process next page?')){
                 n = $('[id*="vote_up_"]').length;
                 RateUpEvrthng(i);
             }else{m_RUD.Dismiss();}
