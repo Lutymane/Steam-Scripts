@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Steam Activity Feed
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  This script allows you posting statuses about apps using their IDs. Also you can now rate up all posts in your activity feed in 2 clicks.
 // @author       Lite_OnE
 // @match        http://steamcommunity.com/*/*/home/
@@ -29,7 +29,6 @@ unsafeWindow.init_RateUpEvrthng = function() {
         n2 = $('[id*="VoteUpBtn_"]').length;
         if (n2>0){RateUpStage1();}
         RateUpStage2(0);
-        alert ('Thank you very much for using this script! Script is still in development, so any suggestions regarding improvements and new ideas to do is appreciated! Leave a comment on github page or on my Steam profile (/id/lite_one/)');
     }
 };
 
@@ -54,9 +53,14 @@ function RateUpStage2 (){
                 n2 = $('[id*="VoteUpBtn_"]').length;
                 if (n2>0){RateUpStage1();}
                 RateUpStage2(i);
-            }else{m_RUD.Dismiss();}
+            }else{m_RUD.Dismiss();thnx();}
         }, 3000);
     }
+    return;
+}
+
+function thnx(){
+    ShowAlertDialog ('','Thank you very much for using this script! Script is still in development, so any suggestions regarding improvements and new ideas to do is appreciated! Leave a comment on github page or on my Steam profile (/id/lite_one/)');
     return;
 }
 
