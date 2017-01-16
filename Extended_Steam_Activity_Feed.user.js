@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Steam Activity Feed
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  This script allows you posting statuses about apps using their IDs. Also you can now rate up all posts in your activity feed in 2 clicks.
 // @author       Lite_OnE
 // @match        http://steamcommunity.com/*/*/home/
@@ -10,7 +10,9 @@
 // ==/UserScript==
 
 var n = 0,        //number of posts on page
-    i = 0,        //counter
+    n2 = 0,       //other posts (VoteUpBtn_)
+    i = 0,
+    j = 0,
     m_RUD = null; //m_RUD - modal Rate Up Dialog
 
 
@@ -22,23 +24,35 @@ unsafeWindow.PostStatus = function () {
 
 unsafeWindow.init_RateUpEvrthng = function() {
     if (confirm('Click "Yes" to start rating up everything')) {
-        m_RUD = ShowBlockingWaitDialog("Executing", "Rating up");
+        m_RUD = ShowBlockingWaitDialog("Processing", "Please wait. Script is working ...");
         n = $('[id*="vote_up_"]').length;
-        RateUpEvrthng(i);
+        n2 = $('[id*="VoteUpBtn_"]').length;
+        if (n2>0){RateUpStage1();}
+        RateUpStage2(0);
     }
 };
 
-function RateUpEvrthng (i){
+function RateUpStage1 (){
+    while (j<n2){
+        $('[id*="VoteUpBtn_"]:eq(' + j + ')').click();
+        j++;
+    }
+    return;
+}
+
+function RateUpStage2 (){
     if (i<n){
-        eval($('[id*="vote_up_"]:eq(' + i + ')').attr('onclick').split(' ')[1]);
+        $('[id*="vote_up_"]:eq(' + i + ')').click();
         i++;
-        RateUpEvrthng(i);
+        RateUpStage2(i);
     }else{
         $("html, body").scrollTop($(document).height());
         setTimeout(function (){
             if (confirm('All posts on this page are rated up! Do you want to process next page?')){
                 n = $('[id*="vote_up_"]').length;
-                RateUpEvrthng(i);
+                n2 = $('[id*="VoteUpBtn_"]').length;
+                if (n2>0){RateUpStage1();}
+                RateUpStage2(i);
             }else{m_RUD.Dismiss();}
         }, 3000);
     }
