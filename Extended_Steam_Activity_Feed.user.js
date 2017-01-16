@@ -29,6 +29,7 @@ unsafeWindow.init_RateUpEvrthng = function() {
         n2 = $('[id*="VoteUpBtn_"]').length;
         if (n2>0){RateUpStage1();}
         RateUpStage2(0);
+        alert ('Thank you very much for using this script! Script is still in development, so any suggestions regarding improvements and new ideas to do is appreciated! Leave a comment on github page or on my Steam profile (/id/lite_one/)');
     }
 };
 
@@ -56,6 +57,7 @@ function RateUpStage2 (){
             }else{m_RUD.Dismiss();}
         }, 3000);
     }
+    return;
 }
 
 jQuery(document).ready(function() {
