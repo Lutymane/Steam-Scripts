@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Extended Steam Activity Feed
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  This script allows you posting statuses about apps using their IDs. Also you can now rate up all posts in your activity feed in 2 clicks.
 // @author       Lite_OnE
-// @match        http://steamcommunity.com/*/*/home/
+// @match        *://steamcommunity.com/*/*/home/
 // @grant        unsafeWindow
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
 // ==/UserScript==
@@ -64,8 +64,20 @@ function thnx (){
     return;
 }
 
+//dunno why it needs this .-.
+function golden (){
+    $('.playerAvatar.medium.in-game').attr('class', 'playerAvatar medium golden');
+    $('.playerAvatar.medium.online').attr('class', 'playerAvatar medium golden');
+    $('.user_avatar.playerAvatar.in-game').attr('class', 'user_avatar playerAvatar golden');
+    $('.user_avatar.playerAvatar.online').attr('class', 'user_avatar playerAvatar golden');
+    $('.blotter_avatar_holder').find('a:first').find('div:first').attr('class', 'playerAvatar golden');
+    $('.friendslist_entry_content.persona.in-game').attr('class', 'friendslist_entry_content persona golden');
+    $('.friendslist_entry_content.persona.online').attr('class', 'friendslist_entry_content persona golden');
+}
+
 jQuery(document).ready(function() {
     var emoticon_container = $(".emoticon_container").html();
+    golden();
     $(".blotter_status_submit_ctn:first").replaceWith( '<div id="extended_af_container" style="width:100%;"><div class="profile_options_divider"></div><div style="float: right;" onclick="javascript:PostStatus();" class="btn_darkblue_white_innerfade btn_small"><span>Post status</span></div><span class="emoticon_container">'+ emoticon_container + '</span><input type="text" id="Status_AppID" placeholder="Input AppID" style="width: 75%; font-style: italic; text-align: center;"></div><div class="profile_options_divider"></div><div style="width: 100%; text-align: center;" onclick="javascript:init_RateUpEvrthng();" class="btn_darkblue_white_innerfade btn_small"><span>Rate up everything</span></div>');
     $(".emoticon_container:first").css({"float": "right", "width":"7%"});
 });
