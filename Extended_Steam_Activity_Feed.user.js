@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Extended Steam Activity Feed
 // @namespace    http://tampermonkey.net/
-// @version      0.6
-// @description  This script allows you posting statuses about apps using their IDs. Also you can now rate up all posts in your activity feed in 2 clicks.
+// @version      1.0
+// @description  At this moment the script allows you posting statuses about apps using their ID, rating up all posts in your activity feed in 2 clicks.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/home/
 // @grant        unsafeWindow
@@ -37,7 +37,6 @@ function RateUpStage1 (){
         $('[id*="VoteUpBtn_"]:eq(' + j + ')').click();
         j++;
     }
-    return;
 }
 
 function RateUpStage2 (){
@@ -48,7 +47,7 @@ function RateUpStage2 (){
     }else{
         $("html, body").scrollTop($(document).height());
         setTimeout(function (){
-            if (confirm('All posts on this page are rated up! Do you want to process next page?')){
+            if (confirm('All posts on this page was rated up! Do you want to process next page?')){
                 n = $('[id*="vote_up_"]').length;
                 n2 = $('[id*="VoteUpBtn_"]').length;
                 if (n2>0){RateUpStage1();}
@@ -56,28 +55,30 @@ function RateUpStage2 (){
             }else{m_RUD.Dismiss();thnx();}
         }, 3000);
     }
-    return;
 }
 
 function thnx (){
     ShowAlertDialog ('','Thank you very much for using this script! Script is still in development, so any suggestions regarding improvements and new ideas to do is appreciated! Leave a comment on github page or on my Steam profile (/id/lite_one/)');
-    return;
 }
 
-//dunno why it needs this .-.
+//dunno why it needs this .-. but anyway it looks much more better with gold .^.
 function golden (){
     $('.playerAvatar.medium.in-game').attr('class', 'playerAvatar medium golden');
     $('.playerAvatar.medium.online').attr('class', 'playerAvatar medium golden');
     $('.user_avatar.playerAvatar.in-game').attr('class', 'user_avatar playerAvatar golden');
     $('.user_avatar.playerAvatar.online').attr('class', 'user_avatar playerAvatar golden');
-    $('.blotter_avatar_holder').find('a:first').find('div:first').attr('class', 'playerAvatar golden');
+    $('.blotter_poststatus_avatar').find('div:first').find('a:first').find('div:first').attr('class', 'playerAvatar golden');
+    $('.commentthread_entry').find('div:first').attr('class', 'commentthread_user_avatar playerAvatar golden');
     $('.friendslist_entry_content.persona.in-game').attr('class', 'friendslist_entry_content persona golden');
     $('.friendslist_entry_content.persona.online').attr('class', 'friendslist_entry_content persona golden');
 }
 
-jQuery(document).ready(function() {
-    var emoticon_container = $(".emoticon_container").html();
+$(document).ready(function(){
     golden();
-    $(".blotter_status_submit_ctn:first").replaceWith( '<div id="extended_af_container" style="width:100%;"><div class="profile_options_divider"></div><div style="float: right;" onclick="javascript:PostStatus();" class="btn_darkblue_white_innerfade btn_small"><span>Post status</span></div><span class="emoticon_container">'+ emoticon_container + '</span><input type="text" id="Status_AppID" placeholder="Input AppID" style="width: 75%; font-style: italic; text-align: center;"></div><div class="profile_options_divider"></div><div style="width: 100%; text-align: center;" onclick="javascript:init_RateUpEvrthng();" class="btn_darkblue_white_innerfade btn_small"><span>Rate up everything</span></div>');
-    $(".emoticon_container:first").css({"float": "right", "width":"7%"});
+    $('.blotter_status_submit_ctn:first').find('div').remove();
+    $('.blotter_status_submit_ctn:first').prepend('<div style="float: right;" onclick="javascript:PostStatus();" class="btn_darkblue_white_innerfade btn_small"><span>Post status</span></div>');
+    $('.blotter_status_submit_ctn:first').append( '<div onclick="ShowMenu( \'blotter_appselect_app\', \'blotter_appselect_app_options\', \'left\' ); Blotter_GiveFocus( \'blotter_appselect_app_filter\' ); " id="blotter_appselect_app" class="btn_darkblue_white_innerfade" style="width: 50%; text-align: center; font-style: italic;"><div class="option ellipsis blotter_appselect_activeoption" id="blotter_appselect_app_activeoption">Choose App by Name</div></div><input type="text" id="Status_AppID" placeholder="Input AppID" style="width: 20%; font-style: italic; text-align: center; margin-left: 25px;"></div><div class="profile_options_divider"></div><div style="width: 100%; text-align: center; font-style: italic;" onclick="javascript:init_RateUpEvrthng();" class="btn_darkblue_white_innerfade btn_small"><span>Rate up everything</span>');
+    $('.emoticon_container:first').css({"float": "right", "width":"7%","margin-right":"5px"});
+    $('.blotter_appselect_options.shadow_content').attr('class', 'blotter_appselect_options btn_darkblue_white_innerfade shadow_content');
+    $('#blotter_appselect_app_activeoption').on("DOMSubtreeModified",function(){$('#Status_AppID').val($('#blotter_poststatus_appid').val());});
 });
