@@ -4,7 +4,7 @@
 // @version      1.3.3.7
 // @description  Delite is nubas
 // @author       Lite_OnE
-// @match        *://steamcommunity.com/id/*/
+// @match        *://steamccommunity.com/id/*/
 // @grant        none
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
 // ==/UserScript==
