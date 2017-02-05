@@ -2,7 +2,7 @@
 // @name         Animated Avatar
 // @namespace    http://tampermonkey.net/
 // @version      0.5
-// @description  Delite is nubas
+// @description  Animated avatar in Steam client chat
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/id/*/
 // @grant        none
