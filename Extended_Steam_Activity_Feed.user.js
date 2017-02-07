@@ -58,7 +58,7 @@ function RateUpStage2 (){
 }
 
 function thnx (){
-    ShowAlertDialog ('','Thank you very much for using this script! Script is still in development, so any suggestions regarding improvements and new ideas to do is appreciated! Leave a comment on github page or on my Steam profile (/id/lite_one/)');
+    ShowAlertDialog ('','Thank you very much for using this script! Script is still in development, so any suggestions regarding improvements and new ideas to do is appreciated! Leave a comment on lite-one.tk or github page or on my Steam profile (/id/lite_one/)');
 }
 
 //dunno why it needs this .-. but anyway it looks much more better with gold .^.
