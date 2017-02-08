@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animated Avatar
 // @namespace    http://steamcommunity.com/
-// @version      2.2.0
+// @version      2.2.1
 // @description  Allows you to make your avatar animated using standart game avatars in Steam
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/id/*
@@ -36,7 +36,7 @@ function preset2(){
         setTimeout(function (){$.post('http://steamcommunity.com/games/269570/selectAvatar', { sessionid: g_sessionID, selectedAvatar: 5});}, 6*p);
         setTimeout(function (){$.post('http://steamcommunity.com/games/269570/selectAvatar', { sessionid: g_sessionID, selectedAvatar: 6});}, 7*p);
         setTimeout(function (){$.post('http://steamcommunity.com/games/269570/selectAvatar', { sessionid: g_sessionID, selectedAvatar: 7});}, 8*p);
-        setTimeout(function (){preset2();}, 4*p);
+        setTimeout(function (){preset2();}, 8*p);
     }
 }
 
@@ -47,7 +47,7 @@ function preset3(){
         setTimeout(function (){$.post('http://steamcommunity.com/games/526800/selectAvatar', { sessionid: g_sessionID, selectedAvatar: 2});}, 3*p);
         setTimeout(function (){$.post('http://steamcommunity.com/games/526800/selectAvatar', { sessionid: g_sessionID, selectedAvatar: 3});}, 4*p);
         setTimeout(function (){$.post('http://steamcommunity.com/games/526800/selectAvatar', { sessionid: g_sessionID, selectedAvatar: 4});}, 5*p);
-        setTimeout(function (){preset3();}, 4*p);
+        setTimeout(function (){preset3();}, 5*p);
     }
 }
 
