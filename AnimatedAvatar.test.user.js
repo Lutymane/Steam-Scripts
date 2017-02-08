@@ -75,7 +75,7 @@ $(document).ready(function(){
     $( "#preset5" ).click(function() {preset5();});
     $('#disable_av').click(function() {
         stop_flag=1;
-        ShowAlertDialog ('Info','Animated avatar is disabled!');
+        ShowAlertDialog ('Info','Animated avatar is disabled! Thanks for using this script! Any questions? Visit the support page: lite-one.tk/2017/02/05/animated-avatar');
         $('#enable_av').find('span').css({"display":"block"});
         $('#disable_av').find('span').css({"display":"none"});
         $('#enable_av').find('span').text('Enable Animated Avatar');
