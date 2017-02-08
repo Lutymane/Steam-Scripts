@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Animated Avatar
-// @namespace    http://tampermonkey.net/
-// @version      2.1
+// @namespace    http://steamcommunity.com/
+// @version      2.1.1
 // @description  Allows you to make your avatar animated using standart game avatars in Steam
 // @author       Lite_OnE
-// @match        *://steamcommunity.com/id/*/
+// @match        *://steamcommunity.com/id/*
 // @grant        unsafeWindow
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
 // ==/UserScript==
