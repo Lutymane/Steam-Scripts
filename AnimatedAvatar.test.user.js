@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animated Avatar
 // @namespace    http://steamcommunity.com/
-// @version      2.1.1
+// @version      2.2.0
 // @description  Allows you to make your avatar animated using standart game avatars in Steam
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/id/*
