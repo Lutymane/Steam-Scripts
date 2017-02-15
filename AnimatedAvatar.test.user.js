@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animated Avatar
 // @namespace    *steamcommunity.com/
-// @version      4.1.0
+// @version      4.2.0
 // @description  This script makes your avatar animated using standard game avatars in Steam
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/id/*
@@ -21,7 +21,7 @@ var p = 1000,   //!Dont modify this value or you will get banned!
 function preset(i){
     if (stop_flag===0){
         if (i<ad[cp][1]){
-            $.post('http://steamcommunity.com/games/' + ad[cp][0] + '/selectAvatar', { sessionid: g_sessionID, selectedAvatar: i});
+            $.post('https://steamcommunity.com/games/' + ad[cp][0] + '/selectAvatar', { sessionid: g_sessionID, selectedAvatar: i});
             setTimeout(function (){
                 i++;
                 preset(i);
@@ -35,7 +35,7 @@ function preset(i){
 function presetVIP(x){
     if(stop_flag===0){
         if (x<4){
-            $.post('http://steamcommunity.com/games/' + vip[4] + '/selectAvatar', { sessionid: g_sessionID, selectedAvatar: vip[x]});
+            $.post('https://steamcommunity.com/games/' + vip[4] + '/selectAvatar', { sessionid: g_sessionID, selectedAvatar: vip[x]});
             setTimeout(function (){
                 x++;
                 presetVIP(x);
