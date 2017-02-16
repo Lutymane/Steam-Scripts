@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animated Avatar (HTTPS)
 // @namespace    *steamcommunity.com/
-// @version      4.2.0
+// @version      4.2.1
 // @description  This script makes your avatar animated using standard game avatars in Steam
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/id/*
