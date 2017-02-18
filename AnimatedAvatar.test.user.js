@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animated Avatar
 // @namespace    *steamcommunity.com/
-// @version      4.2.1
+// @version      4.2.2
 // @description  This script makes your avatar animated using standard game avatars in Steam
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/id/*
@@ -10,6 +10,7 @@
 
 var p = 1000,   //!Dont modify this value or you will get banned!
     stop_flag,  //stop flag .-.
+    //how to add own preset: 1st value is appid or name, 2nd - number of images you want to use, it shouldn't be greater than number of all avatars of choosed app!
     ad = [ [471220, 4], [269570, 8], [526800, 5], ['NinjasPlusPlus', 12], ['SuperDistro', 8], [453830, 7], ['sentris', 29], [538410, 6], [536470, 4], [432330, 20] ], //avatars data
     cp, //choosed preset
     data_1 = '<a class="btn_profile_action btn_medium" id="disable_av"><span style="color: #E34234; display:none;">Disable Animated Avatar</span></a><a class="btn_profile_action btn_medium" id="enable_av"><span style="color: #01B1AF; display: block">Enable Animated Avatar</span></a>',
@@ -29,6 +30,10 @@ function preset(i){
             preset(0);
         }
     }
+}
+
+if ($(location).attr('href').split(':')[0]=='https'){
+    $(location).attr('href', 'http:'+$J(location).attr('href').split(':')[1]); //redirect to http protocol if it's https
 }
 
 $(document).ready(function(){
