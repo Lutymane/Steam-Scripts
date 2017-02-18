@@ -33,7 +33,7 @@ function preset(i){
 }
 
 if ($(location).attr('href').split(':')[0]=='https'){
-    $(location).attr('href', 'http:'+$J(location).attr('href').split(':')[1]); //redirect to http protocol if it's https
+    $(location).attr('href', 'http:'+$(location).attr('href').split(':')[1]); //redirect to http protocol if it's https
 }
 
 $(document).ready(function(){
