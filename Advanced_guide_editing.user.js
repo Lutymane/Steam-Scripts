@@ -2,7 +2,7 @@
 // @name         Advanced guide editing
 // @namespace    http://steamcommunity.com/
 // @version      1.0
-// @description  try to take over the world!
+// @description  Empty sectiion title + up to 1 million characters in one section
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/sharedfiles/editguidesubsection/*
 // @grant        unsafeWindow
