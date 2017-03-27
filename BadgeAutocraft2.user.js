@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.0
-// @description  Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page re/loads and other annoying stuff
+// @version      2.1
+// @description  Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
 // @author       Lite_OnE
 // @match        http://steamcommunity.com/id/*/badges/
 // @grant        GM_setValue
@@ -21,7 +21,8 @@ var NumberOfBadgesToCraftOnPage,
     BadgeNumber,
     BadgesCrafted = 0,
     BadgesSkipped = 0,
-    CurrentAppID;
+    CurrentAppID,
+    border;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -70,13 +71,16 @@ function IsInBlackList(id){
 
 function ToggleAutocraft(i){
     
-    CurrentAppID = $('.badge_craft_button:eq(' + i + ')').attr('href').split('/')[6];
+    CurrentAppID = $('.badge_craft_button:eq(' + i + ')').attr('href').split('/')[6].split('?')[0];
+    
+    if ($('.badge_craft_button:eq(' + i + ')').attr('href').includes("?border=1")) border = 1; else border = 0;
+    
     if (!IsInBlackList(CurrentAppID))
     {
         $.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
-        border_color: 0,
+        border_color: border,
         sessionid: g_sessionID
         });
         
@@ -124,9 +128,6 @@ $(document).ready(function(){
     {
         TimeOutValue = GM_SuperValue.get('TO');
     }
-    
-    //GM_SuperValue.set ('XP_EARNED', 0); //concept
-    //GM_deleteValue('PageFlag'); //delete when release
     
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
     
