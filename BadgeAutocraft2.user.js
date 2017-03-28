@@ -77,7 +77,7 @@ function ToggleAutocraft(i){
     
     if (!IsInBlackList(CurrentAppID))
     {
-        $.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
+        $.post('https://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
         border_color: border,
