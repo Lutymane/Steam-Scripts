@@ -120,7 +120,7 @@ $(document).ready(function(){
     $('#ResetSettings').click(function(){ResetSettings();});
     $('.newmodal_close').click(function(){$('#ModalBlock').css('display', 'none');});
     
-    if ($.isNumeric(GM_SuperValue.get('BLAID')))
+    if (GM_SuperValue.get('BLAID') !== null)
     {
         BlackListAppIDs = GM_SuperValue.get('BLAID');
     }
