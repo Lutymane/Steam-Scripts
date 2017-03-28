@@ -120,11 +120,11 @@ $(document).ready(function(){
     $('#ResetSettings').click(function(){ResetSettings();});
     $('.newmodal_close').click(function(){$('#ModalBlock').css('display', 'none');});
     
-    if (GM_SuperValue.get('BLAID') !== null)
+    if ($.isNumeric(GM_SuperValue.get('BLAID')))
     {
         BlackListAppIDs = GM_SuperValue.get('BLAID');
     }
-    if (GM_SuperValue.get('TO') !== null)
+    if ($.isNumeric(GM_SuperValue.get('TO')))
     {
         TimeOutValue = GM_SuperValue.get('TO');
     }
