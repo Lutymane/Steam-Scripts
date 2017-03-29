@@ -131,6 +131,7 @@ $(document).ready(function(){
     
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
     
+    /*
     if (GM_SuperValue.get('PageFlag') === 1 && NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed') )
     {
         ToggleAutocraft(0);
@@ -141,4 +142,5 @@ $(document).ready(function(){
         GM_deleteValue('BlackListed');
         ShowAlertDialog ('Info','Crafting is done!');
     }
+    */
 });
