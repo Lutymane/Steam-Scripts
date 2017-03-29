@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.7
+// @version      2.1.8
 // @description  Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges/
@@ -15,7 +15,7 @@
 var NumberOfBadgesToCraftOnPage,
     dataButtons = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
     ModalBlockData = '<div id="ModalBlock" style="display:none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><input type="text" id="BlackList" placeholder="Input AppIDs to skip crafting of these badges (appid1, appid2, ...)" style="width: 100%; font-style: italic; text-align: center;"><input type="text" id="TimeOut" placeholder="Timeout between crafting in milliseconds, default value is 1500" style="width: 100%; font-style: italic; text-align: center;"></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
-    BlackListAppIDs = null,
+    BlackListAppIDs = [],
     TimeOutValue = 1500,
     ModalInfo = null,
     BadgeNumber,
@@ -75,14 +75,14 @@ function ToggleAutocraft(i){
     
     if ($('.badge_craft_button:eq(' + i + ')').attr('href').includes("?border=1")) border = 1; else border = 0;
     
-    if (!IsInBlackList(CurrentAppID) || BlackListAppIDs === null)
+    if (!IsInBlackList(CurrentAppID))
     {
-        $.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
+        /*$.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
         border_color: border,
         sessionid: g_sessionID
-        });
+        });*/
         
         BadgesCrafted++;
     }
@@ -120,7 +120,7 @@ $(document).ready(function(){
     $('#ResetSettings').click(function(){ResetSettings();});
     $('.newmodal_close').click(function(){$('#ModalBlock').css('display', 'none');});
     
-    if (GM_SuperValue.get('BLAID') !== null)
+    if (GM_SuperValue.get('BLAID') != null)
     {
         BlackListAppIDs = GM_SuperValue.get('BLAID');
     }
@@ -129,18 +129,25 @@ $(document).ready(function(){
         TimeOutValue = GM_SuperValue.get('TO');
     }
     
+    //debug
+    //alert (GM_SuperValue.get('BLAID'));
+    //alert (TimeOutValue);
+    //if (GM_SuperValue.get('BLAID') != null) BlackListAppIDs = GM_SuperValue.get('BLAID');
+    //alert(BlackListAppIDs);
+    //
+    
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
     
     /*
-    if (GM_SuperValue.get('PageFlag') === 1 && NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed') )
+    if (GM_SuperValue.get('PageFlag') === 1)
     {
-        ToggleAutocraft(0);
-    }
-    else if (GM_SuperValue.get('PageFlag') === 1 && NumberOfBadgesToCraftOnPage === GM_SuperValue.get('BlackListed'))
-    {
-        GM_deleteValue('PageFlag');
-        GM_deleteValue('BlackListed');
-        ShowAlertDialog ('Info','Crafting is done!');
+        if (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed')) ToggleAutocraft(0);
+        else
+        {
+            GM_deleteValue('PageFlag');
+            GM_deleteValue('BlackListed');
+            ShowAlertDialog ('Info','Crafting is done!');
+        }
     }
     */
 });
