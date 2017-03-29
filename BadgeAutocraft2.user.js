@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.8
+// @version      2.1.9
 // @description  Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges/
@@ -77,12 +77,12 @@ function ToggleAutocraft(i){
     
     if (!IsInBlackList(CurrentAppID))
     {
-        /*$.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
+        $.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
         border_color: border,
         sessionid: g_sessionID
-        });*/
+        });
         
         BadgesCrafted++;
     }
