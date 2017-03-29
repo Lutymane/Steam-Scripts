@@ -1,10 +1,13 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.10
+// @version      2.1.11
 // @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges/
+// @supportURL   https://github.com/LiteOnE/steam_scripts/issues
+// @updateURL    https://github.com/LiteOnE/steam_scripts/raw/master/BadgeAutocraft2.user.js
+// @downloadURL  https://github.com/LiteOnE/steam_scripts/raw/master/BadgeAutocraft2.user.js
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -16,7 +19,7 @@ var NumberOfBadgesToCraftOnPage,
     dataButtons = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
     ModalBlockData = '<div id="ModalBlock" style="display:none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><input type="text" id="BlackList" placeholder="Input AppIDs to skip crafting of these badges (appid1, appid2, ...)" style="width: 100%; font-style: italic; text-align: center;"><input type="text" id="TimeOut" placeholder="Timeout between crafting in milliseconds, default value is 1500" style="width: 100%; font-style: italic; text-align: center;"></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
     BlackListAppIDs = [],
-    TimeOutValue = 1500,
+    TimeOutValue = 500, //test 500ms
     ModalInfo = null,
     BadgeNumber,
     BadgesCrafted = 0,
