@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.9
-// @description  Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
+// @version      2.1.10
+// @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges/
 // @grant        GM_setValue
@@ -77,7 +77,7 @@ function ToggleAutocraft(i){
     
     if (!IsInBlackList(CurrentAppID))
     {
-        $.post('http://steamcommunity.com/profiles/' + g_steamID + '/ajaxcraftbadge/', {
+        $.post( $(location).attr('href').replace("/badges/", '')+'/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
         border_color: border,
@@ -129,16 +129,8 @@ $(document).ready(function(){
         TimeOutValue = GM_SuperValue.get('TO');
     }
     
-    //debug
-    //alert (GM_SuperValue.get('BLAID'));
-    //alert (TimeOutValue);
-    //if (GM_SuperValue.get('BLAID') != null) BlackListAppIDs = GM_SuperValue.get('BLAID');
-    //alert(BlackListAppIDs);
-    //
-    
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
     
-    /*
     if (GM_SuperValue.get('PageFlag') === 1)
     {
         if (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed')) ToggleAutocraft(0);
@@ -149,5 +141,4 @@ $(document).ready(function(){
             ShowAlertDialog ('Info','Crafting is done!');
         }
     }
-    */
 });
