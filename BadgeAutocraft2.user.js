@@ -2,7 +2,7 @@
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
 // @version      2.1.12
-// @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. It works now by sending post requests, no more page loads
+// @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Also it includes blacklist for craft avoiding.
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges/
 // @supportURL   https://github.com/LiteOnE/steam_scripts/issues
