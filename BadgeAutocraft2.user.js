@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.12
+// @version      2.1.13
 // @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Also it includes blacklist for craft avoiding.
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges/
@@ -56,6 +56,7 @@ function ResetSettings(){
     GM_deleteValue('TO');
     $('#BlackList').val(GM_SuperValue.get('BLAID'));
     $('#TimeOut').val(GM_SuperValue.get('TO'));
+    TimeOutValue = 1500; //ye you can cheat a bit of time, tssss... but keep in mind that minimum timeout servers can process is 1000 ms
 }
 
 function SettingsModal(){
