@@ -1,3 +1,3 @@
 Different scripts for steam
 
-yEs
+Click 'Raw' to install
