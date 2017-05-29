@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Advanced guide editing
+// @name         Extended guide editing
 // @namespace    http://steamcommunity.com/
 // @version      1.0
 // @description  Empty sectiion title + up to 1 million characters in one section
