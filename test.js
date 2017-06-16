@@ -1,4 +1,4 @@
-var g = $J.post("http://steamcommunity.com/id/LeZoidberg/ajaxenableprofilemodifier/", {
+var g = $J.post("http://steamcommunity.com/id/*/ajaxenableprofilemodifier/", {
   sessionid: g_sessionID,
   appid: "753",
   assetid: "1309377320",
