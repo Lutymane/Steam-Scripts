@@ -114,6 +114,13 @@ function ToggleAutocraft(i){
     
 }
 
+function Exit()
+{
+    GM_deleteValue('PageFlag');
+    GM_deleteValue('BlackListed');
+    ShowAlertDialog ('Info','Crafting is done!');
+}
+
 $(document).ready(function(){
     $('.badge_details_set_favorite').append(dataButtons);
     $('.responsive_page_frame.with_header').after(ModalBlockData);
@@ -139,10 +146,6 @@ $(document).ready(function(){
     {
         if (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed')) ToggleAutocraft(0);
         else
-        {
-            GM_deleteValue('PageFlag');
-            GM_deleteValue('BlackListed');
-            ShowAlertDialog ('Info','Crafting is done!');
-        }
+            Exit();
     }
 });
