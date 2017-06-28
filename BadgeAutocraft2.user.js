@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.16
+// @version      2.1.17
 // @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Also it includes blacklist for craft avoiding.
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges*
@@ -46,22 +46,22 @@ function ApplySettings(){
         alert ('Invalid timeout!');
         return;
     }
-    GM_SuperValue.set ('BLAID', BlackListAppIDs);
+    GM_SuperValue.set ('BlackListedAppIDs', BlackListAppIDs);
     GM_SuperValue.set ('TO', TimeOutValue);
     $('#ModalBlock').css('display', 'none');
 }
 
 function ResetSettings(){
-    GM_deleteValue('BLAID');
+    GM_deleteValue('BlackListedAppIDs');
     GM_deleteValue('TO');
-    $('#BlackList').val(GM_SuperValue.get('BLAID'));
+    $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
     $('#TimeOut').val(GM_SuperValue.get('TO'));
     TimeOutValue = 1500; //ye you can cheat a bit of time, tssss... but keep in mind that minimum timeout servers can process is 1000 ms
 }
 
 function SettingsModal(){
     $('#ModalBlock').css('display', 'block');
-    $('#BlackList').val(GM_SuperValue.get('BLAID'));
+    $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
     $('#TimeOut').val(GM_SuperValue.get('TO'));
 }
 
@@ -74,6 +74,12 @@ function IsInBlackList(id){
 }
 
 function ToggleAutocraft(i){
+    
+    if (NumberOfBadgesToCraftOnPage == 0)
+    {
+        ShowAlertDialog("","There are no badges to crafte!");
+        return;
+    }
     
     CurrentAppID = $('.badge_craft_button:eq(' + i + ')').attr('href').split('/')[6].split('?')[0];
     
@@ -108,7 +114,15 @@ function ToggleAutocraft(i){
     {
         ModalInfo.Dismiss();
         GM_SuperValue.set ('PageFlag', 1);
-        GM_SuperValue.set ('BlackListed', BadgesSkipped);
+        
+        if(BadgesSkipped == 0)
+        {
+            GM_SuperValue.set ('BlackListed', -1);
+        }
+        else
+        {
+            GM_SuperValue.set ('BlackListed', BadgesSkipped);
+        }
         location.reload();
     }
     
@@ -133,9 +147,9 @@ $(document).ready(function(){
     $('#ResetSettings').click(function(){ResetSettings();});
     $('.newmodal_close').click(function(){$('#ModalBlock').css('display', 'none');});
     
-    if (GM_SuperValue.get('BLAID') != null)
+    if (GM_SuperValue.get('BlackListedAppIDs') != null)
     {
-        BlackListAppIDs = GM_SuperValue.get('BLAID');
+        BlackListAppIDs = GM_SuperValue.get('BlackListedAppIDs');
     }
     if ($.isNumeric(GM_SuperValue.get('TO')))
     {
@@ -146,7 +160,13 @@ $(document).ready(function(){
     
     if (GM_SuperValue.get('PageFlag') == 1)
     {
-        if (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed')) ToggleAutocraft(0);
-        else Exit();
+        if (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed'))
+        {
+            ToggleAutocraft(0);
+        }
+        else
+        {
+            Exit();
+        }
     }
 });
