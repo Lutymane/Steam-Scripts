@@ -131,7 +131,7 @@ function ToggleAutocraft(i){
 function Exit()
 {
     GM_SuperValue.set ('PageFlag', 0);
-    GM_SuperValue.set ('BlackListed', 0);
+    GM_SuperValue.set ('BlackListed', -1);
     //GM_deleteValue('PageFlag');
     //GM_deleteValue('BlackListed');
     ShowAlertDialog ('Info','Crafting is done!');
