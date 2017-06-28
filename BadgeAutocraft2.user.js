@@ -77,7 +77,7 @@ function ToggleAutocraft(i){
     
     if (NumberOfBadgesToCraftOnPage == 0)
     {
-        ShowAlertDialog("","There are no badges to crafte!");
+        ShowAlertDialog("","There are no badges to craft!");
         return;
     }
     
