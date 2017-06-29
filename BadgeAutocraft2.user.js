@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.20
+// @version      2.1.21
 // @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Also it includes blacklist for craft avoiding.
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges*
@@ -158,7 +158,7 @@ $(document).ready(function(){
     
     if (GM_SuperValue.get('PageFlag') == 1)
     {
-        if (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed'))
+        if ((NumberOfBadgesToCraftOnPage > 0) && (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed')))
         {
             ToggleAutocraft(0);
         }
