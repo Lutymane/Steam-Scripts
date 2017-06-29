@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.18
+// @version      2.1.19
 // @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Also it includes blacklist for craft avoiding.
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/id/*/badges*
-// @supportURL   https://github.com/LiteOnE/steam_scripts/issues
-// @updateURL    https://github.com/LiteOnE/steam_scripts/raw/master/BadgeAutocraft2.user.js
-// @downloadURL  https://github.com/LiteOnE/steam_scripts/raw/master/BadgeAutocraft2.user.js
+// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
+// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
+// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -37,7 +37,7 @@ function ApplySettings(){
         }
         else if (parseInt($('#TimeOut').val())<1500)
         {
-            alert ('Timeout can not be less than 1500!');
+            alert ('Timeout can not be less than 1500!'); //Actually it can be .-.
             return;
         }
     }
@@ -56,7 +56,7 @@ function ResetSettings(){
     GM_deleteValue('TO');
     $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
     $('#TimeOut').val(GM_SuperValue.get('TO'));
-    TimeOutValue = 1500; //ye you can cheat a bit of time, tssss... but keep in mind that minimum timeout servers can process is 1000 ms
+    TimeOutValue = 1500; //As I said you can cheat it, tssss... but keep in mind that minimum timeout, that servers can process is 1000 ms
 }
 
 function SettingsModal(){
@@ -77,7 +77,7 @@ function ToggleAutocraft(i){
     
     if (NumberOfBadgesToCraftOnPage == 0)
     {
-        ShowAlertDialog("","There are no badges to craft!");
+        ShowAlertDialog("Info","There are no badges to craft!");
         return;
     }
     
@@ -87,7 +87,7 @@ function ToggleAutocraft(i){
     
     if (!IsInBlackList(CurrentAppID))
     {
-        $.post( $(location).attr('href').replace("/badges/", '')+'/ajaxcraftbadge/', {
+        $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
         border_color: border,
