@@ -21,6 +21,5 @@ unsafeWindow.ValidateEditAdvanced = function () {
 		sessionid : g_sessionID,
 		title : title.value,
 		description : description.value}).success(function() {location.reload();});
-    alert ('Done! Now you can reload the page!');
 };
 
