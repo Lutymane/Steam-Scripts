@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Extended guide editing
+// @name         Advanced guide editing
 // @namespace    http://steamcommunity.com/
-// @version      1.1
-// @description  Empty section title + up to 1 million characters in one section
+// @version      2.0
+// @description  It allows you to save guide subsections with empty titles and body lenght up to one million characters.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/sharedfiles/editguidesubsection/*
 // @grant        unsafeWindow
@@ -10,16 +10,17 @@
 // ==/UserScript==
 
 var url = $(location).attr('href').replace('#', '');
-var protocol;
 
-$(".btn_green_white_innerfade.btn_small_thin").attr("href", "javascript:ValidateEditExt();");
+$(".btn_green_white_innerfade.btn_small_thin").attr("href", "javascript:ValidateEditAdvanced();");
 
-unsafeWindow.ValidateEditExt = function () {
+unsafeWindow.ValidateEditAdvanced = function () {
+    g_contentChanged = false;
     $.post("//steamcommunity.com/sharedfiles/setguidesubsection", {
         id : url.split("?")[1].split("&")[0].split("=")[1],
-	sectionid : url.split("?")[1].split("&")[1].split("=")[1],
-	sessionid : g_sessionID,
-	title : title.value,
-	description : description.value});
-    ShowAlertDialog( '', 'Done! Now you can reload the page!');
+		sectionid : url.split("?")[1].split("&")[1].split("=")[1],
+		sessionid : g_sessionID,
+		title : title.value,
+		description : description.value}).success(function() {location.reload();});
+    alert ('Done! Now you can reload the page!');
 };
+
