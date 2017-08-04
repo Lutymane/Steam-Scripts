@@ -12,19 +12,10 @@
 var url = $(location).attr('href').replace('#', '');
 var protocol;
 
-if (url.split(':')[0]=='https')
-{
-    protocol = "https";
-}
-else
-{
-    protocol = "http";
-}
-
 $(".btn_green_white_innerfade.btn_small_thin").attr("href", "javascript:ValidateEditExt();");
 
 unsafeWindow.ValidateEditExt = function () {
-    $.post(protocol + "://steamcommunity.com/sharedfiles/setguidesubsection", {
+    $.post("//steamcommunity.com/sharedfiles/setguidesubsection", {
         id : url.split("?")[1].split("&")[0].split("=")[1],
 	sectionid : url.split("?")[1].split("&")[1].split("=")[1],
 	sessionid : g_sessionID,
