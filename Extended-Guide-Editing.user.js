@@ -20,6 +20,6 @@ unsafeWindow.ValidateEditAdvanced = function () {
 		sectionid : url.split("?")[1].split("&")[1].split("=")[1],
 		sessionid : g_sessionID,
 		title : title.value,
-		description : description.value}).success(function() {location.reload();});
+		description : description.value});
 };
 
