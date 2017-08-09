@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.1.23
-// @description  Huge thanks to Psy0ch for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Also it includes blacklist for craft avoiding.
+// @version      2.2.0
+// @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click.
 // @author       Lite_OnE
 // @match        http*://steamcommunity.com/*/*/badges*
 // @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
@@ -17,7 +17,7 @@
 
 var NumberOfBadgesToCraftOnPage,
     dataButtons = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
-    ModalBlockData = '<div id="ModalBlock" style="display:none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><input type="text" id="BlackList" placeholder="Input AppIDs to skip crafting of these badges (appid1, appid2, ...)" style="width: 100%; font-style: italic; text-align: center;"><input type="text" id="TimeOut" placeholder="Timeout between crafting in milliseconds, default value is 1500" style="width: 100%; font-style: italic; text-align: center;"></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
+    ModalBlockData = '<div id="ModalBlock" style="display:none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><input type="text" id="BlackList" style="font-style: italic; margin: 5px;">AppIDs to skip crafting of these badges (appid1, appid2, ...)</div><div style="text-align:left"><input style="font-style: italic; margin: 5px;" id="TimeOut" type="text">Timeout between crafting in milliseconds</div><div><input type="checkbox" id="IgnoreFoilBadges" style="margin: 5px;">Check this if you want to ignore foil badges while crafting</div></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
     BlackListAppIDs = [],
     TimeOutValue = 1500,
     ModalInfo = null,
@@ -25,7 +25,8 @@ var NumberOfBadgesToCraftOnPage,
     BadgesCrafted = 0,
     BadgesSkipped = 0,
     CurrentAppID,
-    border;
+    border,
+    IgnoreFoils;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -37,7 +38,7 @@ function ApplySettings(){
         }
         else if (parseInt($('#TimeOut').val())<1500)
         {
-            alert ('Timeout can not be less than 1500!'); //Actually it can be .-.
+            alert ('Timeout can not be less than 1500!'); //Actually it can be .-. But it's a ... it's a secret
             return;
         }
     }
@@ -46,23 +47,36 @@ function ApplySettings(){
         alert ('Invalid timeout!');
         return;
     }
+    
+    if($('#IgnoreFoilBadges').is(':checked')){
+        GM_SuperValue.set ('IgnoreFoils', "true");
+        IgnoreFoils = true;
+    }
+    else{
+        GM_SuperValue.set ('IgnoreFoils', "false");
+        IgnoreFoils = false;
+    }
+    
     GM_SuperValue.set ('BlackListedAppIDs', BlackListAppIDs);
-    GM_SuperValue.set ('TO', TimeOutValue);
+    GM_SuperValue.set ('TimeOut', TimeOutValue);
     $('#ModalBlock').css('display', 'none');
 }
 
 function ResetSettings(){
     GM_deleteValue('BlackListedAppIDs');
-    GM_deleteValue('TO');
+    GM_deleteValue('TimeOut');
+    GM_deleteValue('IgnoreFoils');
     $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
-    $('#TimeOut').val(GM_SuperValue.get('TO'));
+    $('#TimeOut').val(GM_SuperValue.get('TimeOut'));
     TimeOutValue = 1500; //As I said you can cheat it, tssss... but keep in mind that minimum timeout, that servers can process is 1000 ms
+    IgnoreFoils = false;
+    $('#IgnoreFoilBadges').prop('checked', false);
 }
 
 function SettingsModal(){
     $('#ModalBlock').css('display', 'block');
     $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
-    $('#TimeOut').val(GM_SuperValue.get('TO'));
+    $('#TimeOut').val(GM_SuperValue.get('TimeOut'));
 }
 
 function IsInBlackList(id){
@@ -83,12 +97,15 @@ function ToggleAutocraft(i){
         return;
     }
     
-    CurrentAppID = $('.badge_craft_button:eq(' + i + ')').attr('href').split('/')[6].split('?')[0];
+    CurrentAppID = $('.badge_craft_button').eq(i).attr('href').split('/')[6].split('?')[0];
     
-    if ($('.badge_craft_button:eq(' + i + ')').attr('href').includes("?border=1")) border = 1; else border = 0;
+    if ($('.badge_craft_button').eq(i).attr('href').includes("?border=1")) border = 1; else border = 0;
     
-    if (!IsInBlackList(CurrentAppID))
+    if (IsInBlackList(CurrentAppID) || (border == 1 && IgnoreFoils == true))
     {
+        BadgesSkipped++;
+    }
+    else{
         $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
         appid: CurrentAppID,
         series: 1,
@@ -98,7 +115,6 @@ function ToggleAutocraft(i){
         
         BadgesCrafted++;
     }
-    else BadgesSkipped++;
     
     BadgeNumber = i+1;
     ModalInfo = ShowBlockingWaitDialog("Crafting on current page...", "Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed! Crafted: " + BadgesCrafted + " Skipped: " + BadgesSkipped);
@@ -151,9 +167,18 @@ $(document).ready(function(){
     {
         BlackListAppIDs = GM_SuperValue.get('BlackListedAppIDs');
     }
-    if ($.isNumeric(GM_SuperValue.get('TO')))
+    if ($.isNumeric(GM_SuperValue.get('TimeOut')))
     {
-        TimeOutValue = GM_SuperValue.get('TO');
+        TimeOutValue = GM_SuperValue.get('TimeOut');
+    }
+    
+    if(GM_SuperValue.get('IgnoreFoils') != null){
+        if(GM_SuperValue.get('IgnoreFoils') == "true"){$('#IgnoreFoilBadges').prop('checked', true); IgnoreFoils = true;}
+        else{$('#IgnoreFoilBadges').prop('checked', false); IgnoreFoils = false;}
+    }
+    else{
+        GM_SuperValue.set ('IgnoreFoils', "false");
+        IgnoreFoils = false;
     }
     
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
