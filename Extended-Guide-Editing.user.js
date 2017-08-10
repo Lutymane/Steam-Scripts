@@ -1,6 +1,5 @@
 // ==UserScript==
-// @name         Advanced guide editing
-// @namespace    http://steamcommunity.com/
+// @name         Advanced Guide Editing
 // @version      2.1
 // @description  It allows you to save guide subsections with empty titles and body length up to one million characters.
 // @author       Lite_OnE
