@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Advanced guide editing
 // @namespace    http://steamcommunity.com/
-// @version      2.0
+// @version      2.1
 // @description  It allows you to save guide subsections with empty titles and body length up to one million characters.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/sharedfiles/editguidesubsection/*
@@ -11,11 +11,12 @@
 
 var url = $(location).attr('href').replace('#', '');
 
-$(".btn_green_white_innerfade.btn_small_thin").attr("href", "javascript:ValidateEditAdvanced();");
+$('.btn_green_white_innerfade.btn_small_thin').attr('href', "javascript:ValidateEditAdvanced();");
+$('#description').attr('maxlength', '1000000000');
 
 unsafeWindow.ValidateEditAdvanced = function () {
     g_contentChanged = false;
-    $.post("//steamcommunity.com/sharedfiles/setguidesubsection", {
+    $.post('//steamcommunity.com/sharedfiles/setguidesubsection', {
         id : url.split("?")[1].split("&")[0].split("=")[1],
 	sectionid : url.split("?")[1].split("&")[1].split("=")[1],
 	sessionid : g_sessionID,
