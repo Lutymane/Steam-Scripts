@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.2.0
+// @version      2.3.0
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click.
 // @author       Lite_OnE
-// @match        http*://steamcommunity.com/*/*/badges*
+// @match        *steamcommunity.com/*/*/badges*
 // @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
 // @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
@@ -106,12 +106,17 @@ function ToggleAutocraft(i){
         BadgesSkipped++;
     }
     else{
-        $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
-        appid: CurrentAppID,
-        series: 1,
-        border_color: border,
-        sessionid: g_sessionID
-        });
+        
+        for(i = 0; i<5; i++){ //it's a kind of a 'dirty' method to craft max level of a game badge. BUT it's most optimized variant since it doesn't do any parsing of html pages and etc.
+            setTimeout(function (){
+                $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
+                    appid: CurrentAppID,
+                    series: 1,
+                    border_color: border,
+                    sessionid: g_sessionID
+                });
+            }, TimeOutValue);
+        }
         
         BadgesCrafted++;
     }
