@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Advanced Guide Editing
+// @name         Extended Guide Editing
 // @version      2.1
 // @description  It allows you to save guide subsections with empty titles and 'unlimited' body text length.
 // @author       Lite_OnE
@@ -8,16 +8,16 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
 // ==/UserScript==
 
-var url = $(location).attr('href').replace('#', '');
+var location = $(location).attr('href').replace('#', '');
 
-$('.btn_green_white_innerfade.btn_small_thin').attr('href', "javascript:ValidateEditAdvanced();");
+$('.btn_green_white_innerfade.btn_small_thin').attr('href', "javascript:ValidateEditExtended();");
 $('#description').attr('maxlength', '1000000000');
 
-unsafeWindow.ValidateEditAdvanced = function () {
+unsafeWindow.ValidateEditExtended = function () {
     g_contentChanged = false;
     $.post('//steamcommunity.com/sharedfiles/setguidesubsection', {
-        id : url.split("?")[1].split("&")[0].split("=")[1],
-	sectionid : url.split("?")[1].split("&")[1].split("=")[1],
+        id : location.split("?")[1].split("&")[0].split("=")[1],
+	sectionid : location.split("?")[1].split("&")[1].split("=")[1],
 	sessionid : g_sessionID,
 	title : title.value,
 	description : description.value});
