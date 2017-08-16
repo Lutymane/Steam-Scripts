@@ -26,7 +26,8 @@ var NumberOfBadgesToCraftOnPage,
     BadgesSkipped = 0,
     CurrentAppID,
     border,
-    IgnoreFoils;
+    IgnoreFoils,
+    TempTimeOut;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -104,6 +105,7 @@ function ToggleAutocraft(i){
     if (IsInBlackList(CurrentAppID) || (border == 1 && IgnoreFoils == true))
     {
         BadgesSkipped++;
+        TempTimeOut = 0;
     }
     else{
         
@@ -115,6 +117,7 @@ function ToggleAutocraft(i){
         });
         
         BadgesCrafted++;
+        TempTimeOut = TimeOutValue;
     }
     
     BadgeNumber = i+1;
@@ -126,7 +129,7 @@ function ToggleAutocraft(i){
             ModalInfo.Dismiss();
             i++;
             ToggleAutocraft(i);
-        }, TimeOutValue);
+        }, TempTimeOut);
 
     }
     else
