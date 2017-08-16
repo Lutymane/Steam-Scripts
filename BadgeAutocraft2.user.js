@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.2
+// @version      2.3.3
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -93,7 +93,7 @@ function ToggleAutocraft(i){
     if (NumberOfBadgesToCraftOnPage == 0)
     {
         GM_SuperValue.set ('PageFlag', 2);
-        GM_SuperValue.set ('BlackListed', -1);
+        GM_SuperValue.set ('Skipped', -1);
         ShowAlertDialog("Info","There are no badges to craft!");
         return;
     }
@@ -139,11 +139,11 @@ function ToggleAutocraft(i){
         
         if(BadgesSkipped == 0)
         {
-            GM_SuperValue.set ('BlackListed', -1);
+            GM_SuperValue.set ('Skipped', -1);
         }
         else
         {
-            GM_SuperValue.set ('BlackListed', BadgesSkipped);
+            GM_SuperValue.set ('Skipped', BadgesSkipped);
         }
         location.reload();
     }
@@ -153,7 +153,7 @@ function ToggleAutocraft(i){
 function Exit()
 {
     GM_SuperValue.set ('PageFlag', 2);
-    GM_SuperValue.set ('BlackListed', -1);
+    GM_SuperValue.set ('Skipped', -1);
     ShowAlertDialog ('Info','Crafting is done!');
 }
 
@@ -171,9 +171,14 @@ $(document).ready(function(){
     {
         BlackListAppIDs = GM_SuperValue.get('BlackListedAppIDs');
     }
+    
     if ($.isNumeric(GM_SuperValue.get('TimeOut')))
     {
         TimeOutValue = GM_SuperValue.get('TimeOut');
+    }
+    else
+    {
+        TimeOutValue = 1500; //wanna cheat?
     }
     
     if(GM_SuperValue.get('IgnoreFoils') != null){
@@ -189,7 +194,7 @@ $(document).ready(function(){
     
     if (GM_SuperValue.get('PageFlag') == 1)
     {
-        if ((NumberOfBadgesToCraftOnPage > 0) && (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('BlackListed')))
+        if ((NumberOfBadgesToCraftOnPage > 0) && (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('Skipped')))
         {
             ToggleAutocraft(0);
         }
