@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.3
+// @version      2.3.4
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -31,15 +31,15 @@ var NumberOfBadgesToCraftOnPage,
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
-    if ($.isNumeric($('#TimeOut').val()) || $('#TimeOut').val() === "")
+    if ($.isNumeric($('#TimeOut').val()) || $('#TimeOut').val() == "")
     {
-        if ($('#TimeOut').val() !== "" && parseInt($('#TimeOut').val())>1499)
+        if ($('#TimeOut').val() != "" && parseInt($('#TimeOut').val())>1499)
         {
             TimeOutValue = parseInt($('#TimeOut').val());
         }
-        else if (parseInt($('#TimeOut').val())<1500)
+        else if ($('#TimeOut').val() != "" && parseInt($('#TimeOut').val())<1500)
         {
-            alert ('Timeout can not be less than 1500!'); //Actually it can be .-. But it's a ... it's a secret
+            alert ('Timeout can not be less than 1500 milliseconds!'); //Actually it can be .-. But it's a ... it's a secret
             return;
         }
     }
