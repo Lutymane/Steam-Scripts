@@ -26,8 +26,7 @@ var NumberOfBadgesToCraftOnPage,
     BadgesSkipped = 0,
     CurrentAppID,
     border,
-    IgnoreFoils,
-    await = true;
+    IgnoreFoils;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -88,26 +87,24 @@ function IsInBlackList(id){
     return false;
 }
 
-function CraftMaxLevel(){
+function CraftMaxLevel(AppID, BorderType){
     $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
-            appid: CurrentAppID,
+            appid: AppID,
             series: 1,
-            border_color: border,
+            border_color: BorderType,
             sessionid: g_sessionID
         }).done(function(data){
         
-        console.log('AppID: ' + CurrentAppID + data.responseJSON.success + ' | XP: ' + data.responseJSON.Badge.xp);
+        console.log('AppID: ' + AppID + ' | Result: ' + data.responseJSON.success + ' | XP: ' + data.responseJSON.Badge.xp);
         
-        if((data.responseJSON.success == 1) && (border != 1) && (data.responseJSON.Badge.xp != "500")){
+        if((data.responseJSON.success == 1) && (BorderType != 1) && (data.responseJSON.Badge.xp != "500")){
             CraftMaxLevel();
         }
         else{
-            await = false;
             return;
         }
     }).fail(function(data){
-        console.log('AppID: ' + CurrentAppID + data.responseJSON.success);
-        await = false;
+        console.log('AppID: ' + AppID + ' | Result: ' + data.responseJSON.success);
         return;
     });
 }
@@ -131,17 +128,17 @@ function ToggleAutocraft(i){
         BadgesSkipped++;
     }
     else{
-        CraftMaxLevel();
+        CraftMaxLevel(CurrentAppID, border);
         BadgesCrafted++;
     }
     
     BadgeNumber = i+1;
     ModalInfo = ShowBlockingWaitDialog("Crafting on current page...", "Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed! Crafted: " + BadgesCrafted + " Skipped: " + BadgesSkipped);
     
-    while (await) {}
-    await = true;
+    //while (await) {}
+    //await = true;
     
-    if (BadgeNumber<NumberOfBadgesToCraftOnPage)
+    if (BadgeNumber < NumberOfBadgesToCraftOnPage)
     {
         setTimeout(function (){
             ModalInfo.Dismiss();
