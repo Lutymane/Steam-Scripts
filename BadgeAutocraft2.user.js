@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.5
+// @version      2.3.6
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -28,7 +28,7 @@ var NumberOfBadgesToCraftOnPage,
     border,
     IgnoreFoils,
     TempTimeOut,
-    PageNumber = 0;
+    PageNumber = 1;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -110,7 +110,7 @@ function ToggleAutocraft(i){
     }
     else{
         
-        $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
+        $.post( window.location.href.split('?')[0].replace("/badges", '/ajaxcraftbadge'), {
             appid: CurrentAppID,
             series: 1,
             border_color: border,
@@ -179,7 +179,7 @@ $(document).ready(function(){
     }
     else
     {
-        TimeOutValue = 1500; //wanna cheat?
+        TimeOutValue = 1500;
     }
     
     if(GM_SuperValue.get('IgnoreFoils') != null){
@@ -201,7 +201,22 @@ $(document).ready(function(){
         }
         else
         {
-            Exit();
+            if (GM_SuperValue.get('Skipped') == 150)
+            {
+                if(window.location.href.split('?')[1] == null)
+                {
+                    window.location = window.location.href + "?p=2";
+                }
+                else
+                {
+                    PageNumber = 1 + parseInt(window.location.href.split('?')[1].split('=')[1]);
+                    window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
+                }
+            }
+            else
+            {
+                Exit();
+            }
         }
     }
 });
