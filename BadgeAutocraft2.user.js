@@ -27,7 +27,8 @@ var NumberOfBadgesToCraftOnPage,
     CurrentAppID,
     border,
     IgnoreFoils,
-    TempTimeOut;
+    TempTimeOut,
+    PageNumber = 0;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -64,9 +65,9 @@ function ApplySettings(){
 }
 
 function ResetSettings(){
-    GM_deleteValue('BlackListedAppIDs');
-    GM_deleteValue('TimeOut');
-    GM_deleteValue('IgnoreFoils');
+    GM_SuperValue.set ('BlackListedAppIDs', null);
+    GM_SuperValue.set ('TimeOut', 1500);
+    GM_SuperValue.set ('IgnoreFoils', false);
     $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
     $('#TimeOut').val(GM_SuperValue.get('TimeOut'));
     TimeOutValue = 1500; //As I said you can cheat it, tssss... but keep in mind that minimum timeout, that servers can process is 1000 ms
