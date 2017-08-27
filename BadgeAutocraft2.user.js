@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.4
+// @version      2.3.7
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -27,7 +27,8 @@ var NumberOfBadgesToCraftOnPage,
     CurrentAppID,
     border,
     IgnoreFoils,
-    TempTimeOut;
+    TempTimeOut,
+    PageNumber = 1;
 
 function ApplySettings(){
     BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
@@ -64,9 +65,9 @@ function ApplySettings(){
 }
 
 function ResetSettings(){
-    GM_deleteValue('BlackListedAppIDs');
-    GM_deleteValue('TimeOut');
-    GM_deleteValue('IgnoreFoils');
+    GM_SuperValue.set ('BlackListedAppIDs', null);
+    GM_SuperValue.set ('TimeOut', 1500);
+    GM_SuperValue.set ('IgnoreFoils', false);
     $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
     $('#TimeOut').val(GM_SuperValue.get('TimeOut'));
     TimeOutValue = 1500; //As I said you can cheat it, tssss... but keep in mind that minimum timeout, that servers can process is 1000 ms
@@ -109,7 +110,7 @@ function ToggleAutocraft(i){
     }
     else{
         
-        $.post( $(location).attr('href').replace("/badges", '')+'/ajaxcraftbadge/', {
+        $.post( window.location.href.split('?')[0].replace("/badges", '/ajaxcraftbadge'), {
             appid: CurrentAppID,
             series: 1,
             border_color: border,
@@ -178,7 +179,7 @@ $(document).ready(function(){
     }
     else
     {
-        TimeOutValue = 1500; //wanna cheat?
+        TimeOutValue = 1500;
     }
     
     if(GM_SuperValue.get('IgnoreFoils') != null){
@@ -200,7 +201,24 @@ $(document).ready(function(){
         }
         else
         {
-            Exit();
+            if (GM_SuperValue.get('Skipped') == 150)
+            {
+                GM_SuperValue.set ('Skipped', -1);
+                
+                if(window.location.href.split('?')[1] == null)
+                {
+                    window.location = window.location.href + "?p=2";
+                }
+                else
+                {
+                    PageNumber = 1 + parseInt(window.location.href.split('?')[1].split('=')[1]);
+                    window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
+                }
+            }
+            else
+            {
+                Exit();
+            }
         }
     }
 });
