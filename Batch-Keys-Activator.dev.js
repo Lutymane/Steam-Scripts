@@ -11,6 +11,7 @@
 
 var Keys = [],
     KeysAmount = 0,
+    Result,
     ResponseResult = [];
 
 function RegisterSuccess(Result){
@@ -69,11 +70,10 @@ function ActivateKey(i){
 			product_key : Keys[i],
 			sessionid : g_sessionID
 		}).done(function(data){
-				if ( data.responseText !== null )
+				if ( data !== null )
                 {
-					var Result;
                     try{
-                        Result = $.parseJSON(data.responseText);
+                        Result = $.parseJSON(data);
                     }
                     catch(e){
                         console.log(e);
