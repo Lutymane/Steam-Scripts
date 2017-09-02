@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Batch Keys Activator
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0.1
+// @version      1.0.0.2
 // @description  Activate a bunch of keys at once
+// @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
-// @manager      Delite
 // @match        https://store.steampowered.com/account/registerkey*
 // @grant        unsafeWindow
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
@@ -16,7 +16,6 @@ var Keys = [],
 
 function RegisterFailure(ePurchaseResult, receipt, key)
 {
-    //switch {} part is taken from valve's js file
     var sErrorMessage = 'An unexpected error has occurred.  Your product code has not been redeemed.  Please wait 30 minutes and try redeeming the code again.  If the problem persists, please contact <a href="https://help.steampowered.com/en/wizard/HelpWithCDKey">Steam Support</a> for further assistance.';
 
 	switch ( ePurchaseResult )
@@ -34,11 +33,11 @@ function RegisterFailure(ePurchaseResult, receipt, key)
 			break;
 
 		case 13:
-			sErrorMessage = 'Sorry, but %1$s is not available for purchase in this country. Your product key has not been redeemed.'.replace( /\%1\$s/, GetGameNameForFailure( receipt ) );//we can use this valve's function lel
+			sErrorMessage = 'Sorry, but %1$s is not available for purchase in this country. Your product key has not been redeemed.'.replace( /\%1\$s/, GetGameNameForFailure( receipt ) );
 			break;
 
 		case 9:
-			sErrorMessage = 'This Steam account already owns the product(s) contained in this offer. To access them, visit your library in the Steam client.';
+			sErrorMessage = 'Product: "%1$s"<br><br>This Steam account already owns the product(s) contained in this offer. To access them, visit your library in the Steam client.'.replace( /\%1\$s/, GetGameNameForFailure( receipt ) );
 			break;
 
 		case 24:
@@ -49,7 +48,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
 			sErrorMessage = 'The product code you have entered requires that you first play %1$s on the PlayStation®3 system before it can be registered.\n\nPlease:\n\n- Start %1$s on your PlayStation®3 system\n\n- Link your Steam account to your PlayStation®3 Network account\n\n- Connect to Steam while playing %1$s on the PlayStation®3 system\n\n- Register this product code through Steam.'.replace( /\%1\$s/g, GetGameNameForFailure( receipt ) );
 			break;
 
-		case 50: // User entered wallet code
+		case 50:
 			sErrorMessage = 'The code you have entered is from a Steam Gift Card or Steam Wallet Code.  Click <a href="https://store.steampowered.com/account/redeemwalletcode">here</a> to redeem it.';
 			break;
 
@@ -59,7 +58,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
 			break;
 	}
     
-    $('#error_display').append('<br><br>Key: ' +  key + "<br>Failed: " + sErrorMessage);
+    $('#error_display').append('<br><br><hr><br>' +  key + "<br><br>Failed! " + sErrorMessage);
 }
 
 function ActivateKey(i)
@@ -69,7 +68,7 @@ function ActivateKey(i)
         {
             if ( Result.success == 1 )
             {
-                $('#error_display').append("<br><br>Key: " + Keys[i] + "<br>Success: " + Result.purchase_receipt_info.line_items[0].line_item_description);
+                $('#error_display').append('<br><br><hr><br>' + Keys[i] + '<br><br>Success! Product: "' + Result.purchase_receipt_info.line_items[0].line_item_description + '" has been added to your account.');
             }
             else if ( Result.purchase_result_details !== undefined && Result.purchase_receipt_info !== undefined)
             {
@@ -86,7 +85,8 @@ function ActivateKey(i)
             }
             else
             {
-                $('#error_display').append('<br><br>Done. All the keys have been processed!');
+                $('#error_display').append('<br><br><hr><br>Done. All the keys have been processed!');
+                $('#error_display').css('background-color', 'rgba(53, 142, 255, 0.3)');
                 return;
             }
         }
@@ -140,4 +140,5 @@ $(document).ready(function(){
     $('#register_btn').attr('href','javascript:InitKeysRegistration();');
     $('#error_display').css('background-color', 'rgba(255, 255, 255, 0.3)');
     $('#error_display').css('display', 'none');
+    $('#error_display').css('transition', 'all 3s ease');
 });
