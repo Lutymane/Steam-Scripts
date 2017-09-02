@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Batch Keys Activator
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0.3
+// @version      1.0.0.4
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
@@ -125,7 +125,7 @@ unsafeWindow.InitKeysRegistration = function()
     }
     else if (!($('#accept_ssa').is(':checked')))
     {
-        $('#error_display').text('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
+        $('#error_display').html('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
     }
     else
     {
