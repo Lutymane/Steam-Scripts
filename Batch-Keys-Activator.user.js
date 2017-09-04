@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Batch Keys Activator
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1.0
+// @version      1.0.1.1
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
@@ -109,7 +109,7 @@ function CleanArray(Source)
     {
         if (Source[i])
         {
-            newArray2 = Source[i].replace(/\s/g, '').split(',');
+            newArray2 = Source[i].replace(/\s+/g, '').split(',');
             for (var j = 0; j < newArray2.length; j++)
             {
                 if (newArray2[j])
