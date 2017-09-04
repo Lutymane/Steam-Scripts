@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Batch Keys Activator
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0.4
+// @version      1.0.0.5
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
@@ -96,7 +96,8 @@ function ActivateKey(i)
         }
     }).fail(function()
     {
-        RegisterFailure(0, null, Keys[i]);
+        $('#error_display').append('<br><br><hr><br>Unexpected error! Try to activate later...');
+        return;
     });
 }
 
