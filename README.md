@@ -1,4 +1,4 @@
-Userscripts for Steam.
+Userscripts for Steam
 
 Use Tampermonkey/Greasemonkey or similar userscript manager
 
