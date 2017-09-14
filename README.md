@@ -1,5 +1,5 @@
-User Scripts for Steam.
+Userscripts for Steam.
 
-Use Tampermonkey/Greasemonkey or similar
+Use Tampermonkey/Greasemonkey or similar userscript manager
 
-To install you should click "Raw" button
+Open script you need and hit "Raw" button to install
