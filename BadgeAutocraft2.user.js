@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.7
+// @version      2.3.8
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -12,7 +12,7 @@
 // @grant        GM_getValue
 // @grant        GM_deleteValue
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
-// @require      https://git.degree.by/degree/userscripts/raw/master/src/gm-super-value.user.js
+// @require      https://raw.githubusercontent.com/LiteOnE/Suprer_GM_setValue_getValue_backup/master/Super_GM_setValue_and_GM_getValue.js
 // ==/UserScript==
 
 var NumberOfBadgesToCraftOnPage,
