@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.9
+// @version      2.3.10
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -224,9 +224,9 @@ $(document).ready(function(){
             }
         }
     }
-    catch
+    catch(e)
     {
-        console.log("Can't load GM_Super_Value library! Script has been disabled!");
+        console.log("Can't load GM_Super_Value library! Script has been disabled!\n" + e);
         $('#ToggleAutocraft').css('display', 'none');
         $('#Settings').css('display', 'none');
     }
