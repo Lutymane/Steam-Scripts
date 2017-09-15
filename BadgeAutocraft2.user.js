@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.8
+// @version      2.3.9
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
@@ -168,57 +168,66 @@ $(document).ready(function(){
     $('#ResetSettings').click(function(){ResetSettings();});
     $('.newmodal_close').click(function(){$('#ModalBlock').css('display', 'none');});
     
-    if (GM_SuperValue.get('BlackListedAppIDs') != null)
-    {
-        BlackListAppIDs = GM_SuperValue.get('BlackListedAppIDs');
-    }
-    
-    if ($.isNumeric(GM_SuperValue.get('TimeOut')))
-    {
-        TimeOutValue = GM_SuperValue.get('TimeOut');
-    }
-    else
-    {
-        TimeOutValue = 1500;
-    }
-    
-    if(GM_SuperValue.get('IgnoreFoils') != null){
-        if(GM_SuperValue.get('IgnoreFoils') == "true"){$('#IgnoreFoilBadges').prop('checked', true); IgnoreFoils = true;}
-        else{$('#IgnoreFoilBadges').prop('checked', false); IgnoreFoils = false;}
-    }
-    else{
-        GM_SuperValue.set ('IgnoreFoils', "false");
-        IgnoreFoils = false;
-    }
-    
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
     
-    if (GM_SuperValue.get('PageFlag') == 1)
+    try
     {
-        if ((NumberOfBadgesToCraftOnPage > 0) && (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('Skipped')))
+        if (GM_SuperValue.get('BlackListedAppIDs') != null)
         {
-            ToggleAutocraft(0);
+           BlackListAppIDs = GM_SuperValue.get('BlackListedAppIDs');
+        }
+    
+        if ($.isNumeric(GM_SuperValue.get('TimeOut')))
+        {
+            TimeOutValue = GM_SuperValue.get('TimeOut');
         }
         else
         {
-            if (GM_SuperValue.get('Skipped') == 150)
+            TimeOutValue = 1500;
+        }
+        
+        if(GM_SuperValue.get('IgnoreFoils') != null){
+            if(GM_SuperValue.get('IgnoreFoils') == "true"){$('#IgnoreFoilBadges').prop('checked', true); IgnoreFoils = true;}
+            else{$('#IgnoreFoilBadges').prop('checked', false); IgnoreFoils = false;}
+        }
+        else{
+            GM_SuperValue.set ('IgnoreFoils', "false");
+            IgnoreFoils = false;
+        }
+        
+        if (GM_SuperValue.get('PageFlag') == 1)
+        {
+            if ((NumberOfBadgesToCraftOnPage > 0) && (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('Skipped')))
             {
-                GM_SuperValue.set ('Skipped', -1);
-                
-                if(window.location.href.split('?')[1] == null)
-                {
-                    window.location = window.location.href + "?p=2";
-                }
-                else
-                {
-                    PageNumber = 1 + parseInt(window.location.href.split('?')[1].split('=')[1]);
-                    window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
-                }
+                ToggleAutocraft(0);
             }
             else
             {
-                Exit();
+                if (GM_SuperValue.get('Skipped') == 150)
+                {
+                    GM_SuperValue.set ('Skipped', -1);
+                    
+                    if(window.location.href.split('?')[1] == null)
+                    {
+                        window.location = window.location.href + "?p=2";
+                    }
+                    else
+                    {
+                        PageNumber = 1 + parseInt(window.location.href.split('?')[1].split('=')[1]);
+                        window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
+                    }
+                }
+                else
+                {
+                    Exit();
+                }
             }
         }
+    }
+    catch
+    {
+        console.log("Can't load GM_Super_Value library! Script has been disabled!");
+        $('#ToggleAutocraft').css('display', 'none');
+        $('#Settings').css('display', 'none');
     }
 });
