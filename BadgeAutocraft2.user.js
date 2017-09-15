@@ -1,233 +1,299 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.3.10
+// @version      2.4.0
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/*/*/badges*
 // @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
 // @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_deleteValue
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
-// @require      https://raw.githubusercontent.com/LiteOnE/Suprer_GM_setValue_getValue_backup/master/Super_GM_setValue_and_GM_getValue.js
 // ==/UserScript==
 
-var NumberOfBadgesToCraftOnPage,
-    dataButtons = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
-    ModalBlockData = '<div id="ModalBlock" style="display:none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><input type="text" id="BlackList" style="font-style: italic; margin: 5px;">AppIDs to skip crafting of these badges (appid1, appid2, ...)</div><div style="text-align:left"><input style="font-style: italic; margin: 5px;" id="TimeOut" type="text">Timeout between crafting in milliseconds</div><div><input type="checkbox" id="IgnoreFoilBadges" style="margin: 5px;">Check this if you want to ignore foil badges while crafting</div></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
-    BlackListAppIDs = [],
-    TimeOutValue = 1500,
-    ModalInfo = null,
-    BadgeNumber,
-    BadgesCrafted = 0,
-    BadgesSkipped = 0,
-    CurrentAppID,
-    border,
-    IgnoreFoils,
-    TempTimeOut,
-    PageNumber = 1;
+var NumberOfBadgesToCraftOnPage = 0,
+    DataButtons                 = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
+    ModalBlockData              = '<div id="ModalBlock" style="display: none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><input type="text" id="BlackList" style="font-style: italic; margin: 5px;">AppIDs to skip crafting of these badges (appid1, appid2, ...)</div><div><input type="checkbox" id="IgnoreFoilBadges" style="margin: 5px;">Check this if you want to ignore foil badges while crafting</div></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
+    BlackListAppIDs             = [],
+    TimeOutValue                = 1500,
+    ModalInfo                   = null,
+    BadgeNumber                 = 0,
+    LevelsCrafted               = 0,
+    BadgesSkipped               = 0,
+    CurrentAppID                = 0,
+    Border                      = 0,
+    IgnoreFoils                 = false,
+    TemporaryTimeOut            = 0,
+    PageNumber                  = 1,
+    PostURL                     = '';
 
-function ApplySettings(){
-    BlackListAppIDs = $('#BlackList').val().replace(/ /g,'').split(',');
-    if ($.isNumeric($('#TimeOut').val()) || $('#TimeOut').val() == "")
+function CleanArray(Source)
+{
+    var CleanedArray = [];
+    for (var i = 0; i < Source.length; i++)
     {
-        if ($('#TimeOut').val() != "" && parseInt($('#TimeOut').val())>1499)
+        if (Source[i])
         {
-            TimeOutValue = parseInt($('#TimeOut').val());
+            CleanedArray.push(Source[i]);
         }
-        else if ($('#TimeOut').val() != "" && parseInt($('#TimeOut').val())<1500)
-        {
-            alert ('Timeout can not be less than 1500 milliseconds!'); //Actually it can be .-. But it's a ... it's a secret
-            return;
-        }
+    }
+    return CleanedArray;
+}
+
+function ApplySettings()
+{
+    BlackListAppIDs = CleanArray($('#BlackList').val().replace(/\s+/g,'').split(','));
+
+    if($('#IgnoreFoilBadges').prop('checked')){
+        window.localStorage.setItem('IgnoreFoils', 'true');
+        IgnoreFoils = true;
     }
     else
     {
-        alert ('Invalid timeout!');
-        return;
-    }
-    
-    if($('#IgnoreFoilBadges').is(':checked')){
-        GM_SuperValue.set ('IgnoreFoils', "true");
-        IgnoreFoils = true;
-    }
-    else{
-        GM_SuperValue.set ('IgnoreFoils', "false");
+        window.localStorage.setItem('IgnoreFoils', 'false');
         IgnoreFoils = false;
     }
-    
-    GM_SuperValue.set ('BlackListedAppIDs', BlackListAppIDs);
-    GM_SuperValue.set ('TimeOut', TimeOutValue);
+
+    window.localStorage.setItem('BlackList', BlackListAppIDs);
+
     $('#ModalBlock').css('display', 'none');
 }
 
-function ResetSettings(){
-    GM_SuperValue.set ('BlackListedAppIDs', null);
-    GM_SuperValue.set ('TimeOut', 1500);
-    GM_SuperValue.set ('IgnoreFoils', false);
-    $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
-    $('#TimeOut').val(GM_SuperValue.get('TimeOut'));
-    TimeOutValue = 1500; //As I said you can cheat it, tssss... but keep in mind that minimum timeout, that servers can process is 1000 ms
+function ResetSettings()
+{
+    window.localStorage.setItem('BlackList', '0');
+    window.localStorage.setItem('IgnoreFoils', 'false');
+
+    BlackListAppIDs = [];
+    $('#BlackList').val('');
+
     IgnoreFoils = false;
     $('#IgnoreFoilBadges').prop('checked', false);
 }
 
-function SettingsModal(){
+function SettingsModal()
+{
     $('#ModalBlock').css('display', 'block');
-    $('#BlackList').val(GM_SuperValue.get('BlackListedAppIDs'));
-    $('#TimeOut').val(GM_SuperValue.get('TimeOut'));
-}
 
-function IsInBlackList(id){
-    for (j=0; j<BlackListAppIDs.length; j++)
-    {
-        if (id == BlackListAppIDs[j]){return true;}
-    }
-    return false;
-}
+    $('#BlackList').val(window.localStorage.getItem('BlackList'));
 
-function ToggleAutocraft(i){
-    
-    if (NumberOfBadgesToCraftOnPage == 0)
+    if(window.localStorage.getItem('IgnoreFoils') == 'true')
     {
-        GM_SuperValue.set ('PageFlag', 2);
-        GM_SuperValue.set ('Skipped', -1);
-        ShowAlertDialog("Info","There are no badges to craft!");
-        return;
-    }
-    
-    CurrentAppID = $('.badge_craft_button').eq(i).attr('href').split('/')[6].split('?')[0];
-    
-    if ($('.badge_craft_button').eq(i).attr('href').includes("?border=1")) border = 1; else border = 0;
-    
-    if (IsInBlackList(CurrentAppID) || (border == 1 && IgnoreFoils == true))
-    {
-        BadgesSkipped++;
-        TempTimeOut = 0;
-    }
-    else{
-        
-        $.post( window.location.href.split('?')[0].replace("/badges", '/ajaxcraftbadge'), {
-            appid: CurrentAppID,
-            series: 1,
-            border_color: border,
-            sessionid: g_sessionID
-        });
-        
-        BadgesCrafted++;
-        TempTimeOut = TimeOutValue;
-    }
-    
-    BadgeNumber = i+1;
-    ModalInfo = ShowBlockingWaitDialog("Crafting on current page...", "Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed! Crafted: " + BadgesCrafted + " Skipped: " + BadgesSkipped);
-    
-    if (BadgeNumber<NumberOfBadgesToCraftOnPage)
-    {
-        setTimeout(function (){
-            ModalInfo.Dismiss();
-            i++;
-            ToggleAutocraft(i);
-        }, TempTimeOut);
-
+        $('#IgnoreFoilBadges').prop('checked', true);
     }
     else
     {
-        ModalInfo.Dismiss();
-        GM_SuperValue.set ('PageFlag', 1);
-        
-        if(BadgesSkipped == 0)
+        $('#IgnoreFoilBadges').prop('checked', false);
+    }
+}
+
+function IsInBlackList(id)
+{
+
+    for (var i = 0; i < BlackListAppIDs.length; i++)
+    {
+        if (id == BlackListAppIDs[i]){return true;}
+    }
+
+    return false;
+}
+
+function ToggleAutocraft(i)
+{
+
+    if (NumberOfBadgesToCraftOnPage == 0)
+    {
+        window.localStorage.setItem('PageFlag', '0');
+        window.localStorage.setItem('Skipped', '0');
+        ShowAlertDialog("Info","There are no badges to craft!");
+        return;
+    }
+
+    BadgeNumber = i + 1;
+    ModalInfo = ShowBlockingWaitDialog("Crafting on a current page...", "Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed! XP earned: " + LevelsCrafted*100 + " Badges skipped: " + BadgesSkipped);
+
+    CurrentAppID = $('.badge_craft_button').eq(i).attr('href').split('/')[6].split('?')[0];
+
+    if ($('.badge_craft_button').eq(i).attr('href').includes("?border=1")) Border = 1; else Border = 0;
+
+    if (IsInBlackList(CurrentAppID) || (Border == 1 && IgnoreFoils == true))
+    {
+        BadgesSkipped++;
+
+        TemporaryTimeOut = 0;
+
+        if (BadgeNumber < NumberOfBadgesToCraftOnPage)
         {
-            GM_SuperValue.set ('Skipped', -1);
+            setTimeout(function (){
+                ModalInfo.Dismiss();
+                i++;
+                ToggleAutocraft(i);
+            }, TemporaryTimeOut);
+
         }
         else
         {
-            GM_SuperValue.set ('Skipped', BadgesSkipped);
-        }
-        location.reload();
-    }
-    
-}
+            ModalInfo.Dismiss();
 
-function Exit()
-{
-    GM_SuperValue.set ('PageFlag', 2);
-    GM_SuperValue.set ('Skipped', -1);
-    ShowAlertDialog ('Info','Crafting is done!');
+            window.localStorage.setItem('PageFlag', '1');
+            window.localStorage.setItem('Skipped', BadgesSkipped);
+
+            window.location.reload();
+        }
+    }
+    else
+    {
+
+        $.post( PostURL, {
+            appid: CurrentAppID,
+            series: 1,
+            border_color: Border,
+            sessionid: g_sessionID
+        }).done(function(data){
+
+            console.log('AppID: ' + CurrentAppID + ' | XP: ' + data.Badge.xp);
+
+            LevelsCrafted++;
+
+            TemporaryTimeOut = TimeOutValue;
+
+            if((data.success == 1) && (Border != 1) && (data.Badge.xp != "500"))
+            {
+                setTimeout(function (){
+                    ModalInfo.Dismiss();
+                    ToggleAutocraft(i);
+                }, TemporaryTimeOut);
+            }
+            else
+            {
+                setTimeout(function (){
+                    ModalInfo.Dismiss();
+                    i++;
+                    ToggleAutocraft(i);
+                }, TemporaryTimeOut);
+            }
+        }).fail(function(data){
+            try
+            {
+                switch(data.responseJSON.success)
+                {
+                    case 42:
+                        console.log('AppID: ' + CurrentAppID + " | You don't own all cards to craft a badge!");
+                        break;
+                    case 11:
+                        console.log('AppID: ' + CurrentAppID + " | Badge's maximum level has been reached!");
+                        break;
+                    default:
+                        console.log('AppID: ' + CurrentAppID + " | Unknown error code: " + data.responseJSON.success);
+                }
+            }
+            catch(e)
+            {
+                console.log(data);
+                console.log(e);
+            }
+
+            TemporaryTimeOut = TimeOutValue;
+
+            if (BadgeNumber < NumberOfBadgesToCraftOnPage)
+            {
+                setTimeout(function (){
+                    ModalInfo.Dismiss();
+                    i++;
+                    ToggleAutocraft(i);
+                }, TemporaryTimeOut);
+
+            }
+            else
+            {
+                ModalInfo.Dismiss();
+
+                window.localStorage.setItem('PageFlag', '1');
+                window.localStorage.setItem('Skipped', BadgesSkipped);
+
+                window.location.reload();
+            }
+        });
+    }
 }
 
 $(document).ready(function(){
-    $('.badge_details_set_favorite').append(dataButtons);
+
+    PostURL = window.location.href.split('?')[0].replace("badges", 'ajaxcraftbadge');
+
+    $('.badge_details_set_favorite').append(DataButtons);
     $('.responsive_page_frame.with_header').after(ModalBlockData);
-    
+
     $('#ToggleAutocraft').click(function(){ToggleAutocraft(0);});
     $('#Settings').click(function(){SettingsModal();});
     $('#ApplySettings').click(function(){ApplySettings();});
     $('#ResetSettings').click(function(){ResetSettings();});
     $('.newmodal_close').click(function(){$('#ModalBlock').css('display', 'none');});
-    
+
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
-    
-    try
+
+    if(window.localStorage.getItem('BlackList') == null || window.localStorage.getItem('IgnoreFoils') == null)
     {
-        if (GM_SuperValue.get('BlackListedAppIDs') != null)
+        alert("Badge Autocraft script can't read settings values! It may occur because of script got updated. Please set up script's settings again, since they are cleared now");
+        return;
+    }
+
+    console.log('Settings are being read...');
+
+    if(window.localStorage.getItem('BlackList') != '0')
+    {
+        BlackListAppIDs = window.localStorage.getItem('BlackList').split(',');
+    }
+
+    if(window.localStorage.getItem('IgnoreFoils') == 'true')
+    {
+        IgnoreFoils = true;
+    }
+
+    if (window.localStorage.getItem('PageFlag') == '1')
+    {
+        if (NumberOfBadgesToCraftOnPage > window.localStorage.getItem('Skipped'))
         {
-           BlackListAppIDs = GM_SuperValue.get('BlackListedAppIDs');
-        }
-    
-        if ($.isNumeric(GM_SuperValue.get('TimeOut')))
-        {
-            TimeOutValue = GM_SuperValue.get('TimeOut');
+            ToggleAutocraft(0);
         }
         else
         {
-            TimeOutValue = 1500;
-        }
-        
-        if(GM_SuperValue.get('IgnoreFoils') != null){
-            if(GM_SuperValue.get('IgnoreFoils') == "true"){$('#IgnoreFoilBadges').prop('checked', true); IgnoreFoils = true;}
-            else{$('#IgnoreFoilBadges').prop('checked', false); IgnoreFoils = false;}
-        }
-        else{
-            GM_SuperValue.set ('IgnoreFoils', "false");
-            IgnoreFoils = false;
-        }
-        
-        if (GM_SuperValue.get('PageFlag') == 1)
-        {
-            if ((NumberOfBadgesToCraftOnPage > 0) && (NumberOfBadgesToCraftOnPage > GM_SuperValue.get('Skipped')))
+            if (window.localStorage.getItem('Skipped') == '150')
             {
-                ToggleAutocraft(0);
-            }
-            else
-            {
-                if (GM_SuperValue.get('Skipped') == 150)
+                window.localStorage.setItem('Skipped', '0');
+
+                var parsedURL = {};
+                var params = window.location.href.split('?')[1];
+
+                if(params != null)
                 {
-                    GM_SuperValue.set ('Skipped', -1);
-                    
-                    if(window.location.href.split('?')[1] == null)
+                    params = params.split('&');
+                    var param = [];
+
+                    for (var i = 0; i < params.length; i++)
                     {
-                        window.location = window.location.href + "?p=2";
+                        param = params[i].split('=');
+                        parsedURL[param[0]] = param[1];
                     }
-                    else
-                    {
-                        PageNumber = 1 + parseInt(window.location.href.split('?')[1].split('=')[1]);
-                        window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
-                    }
+                }
+
+                if(parsedURL['p'] == null)
+                {
+                    window.location = window.location.href + "?p=2";
                 }
                 else
                 {
-                    Exit();
+                    PageNumber+= parseInt(parsedURL['p']);
+                    window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
                 }
             }
+            else
+            {
+                window.localStorage.setItem('PageFlag', '0');
+                window.localStorage.setItem('Skipped', '0');
+
+                ShowAlertDialog ('Info','Crafting is done!');
+            }
         }
-    }
-    catch(e)
-    {
-        console.log("Can't load GM_Super_Value library! Script has been disabled!\n" + e);
-        $('#ToggleAutocraft').css('display', 'none');
-        $('#Settings').css('display', 'none');
     }
 });
