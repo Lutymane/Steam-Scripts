@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.4.0
+// @version      2.4.1
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
-// @match        *steamcommunity.com/*/*/badges*
+// @match        *://steamcommunity.com/*/*/badges/
+// @match        *://steamcommunity.com/*/*/badges/?p=*
 // @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
 // @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/BadgeAutocraft2.user.js
@@ -61,7 +62,7 @@ function ApplySettings()
 
 function ResetSettings()
 {
-    window.localStorage.setItem('BlackList', '0');
+    window.localStorage.setItem('BlackList', '');
     window.localStorage.setItem('IgnoreFoils', 'false');
 
     BlackListAppIDs = [];
@@ -240,7 +241,7 @@ $(document).ready(function(){
 
     console.log('Settings are being read...');
 
-    if(window.localStorage.getItem('BlackList') != '0')
+    if(window.localStorage.getItem('BlackList') != '')
     {
         BlackListAppIDs = window.localStorage.getItem('BlackList').split(',');
     }
@@ -262,28 +263,13 @@ $(document).ready(function(){
             {
                 window.localStorage.setItem('Skipped', '0');
 
-                var parsedURL = {};
-                var params = window.location.href.split('?')[1];
-
-                if(params != null)
+                if(window.location.href.split('?')[1] == null)
                 {
-                    params = params.split('&');
-                    var param = [];
-
-                    for (var i = 0; i < params.length; i++)
-                    {
-                        param = params[i].split('=');
-                        parsedURL[param[0]] = param[1];
-                    }
-                }
-
-                if(parsedURL['p'] == null)
-                {
-                    window.location = window.location.href + "?p=2";
+                    window.location = window.location.href.split('?')[0] + "?p=2";
                 }
                 else
                 {
-                    PageNumber+= parseInt(parsedURL['p']);
+                    PageNumber+= parseInt(window.location.href.split('?')[1].split('&')[0].split('=')[1]);
                     window.location = window.location.href.split('?')[0] + "?p=" + PageNumber;
                 }
             }
