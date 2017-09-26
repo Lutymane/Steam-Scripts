@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.4.1
+// @version      2.4.2
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -225,7 +225,12 @@ $(document).ready(function(){
     $('.badge_details_set_favorite').append(DataButtons);
     $('.responsive_page_frame.with_header').after(ModalBlockData);
 
-    $('#ToggleAutocraft').click(function(){ToggleAutocraft(0);});
+    $('#ToggleAutocraft').click(function(){
+        if(confirm('Do you want to toggle autocraft?'))
+        {
+            ToggleAutocraft(0);
+        }
+    });
     $('#Settings').click(function(){SettingsModal();});
     $('#ApplySettings').click(function(){ApplySettings();});
     $('#ResetSettings').click(function(){ResetSettings();});
