@@ -1,2 +1,2 @@
 
-Beta versions of scripts. Use them on own risk
+Beta versions of the scripts. Use them on own risk
