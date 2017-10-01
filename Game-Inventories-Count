@@ -1,0 +1,12 @@
+// ==UserScript==
+// @name         Game Inventories Count
+// @namespace    #SmallScripts
+// @version      1.0
+// @description  It shows how many game inventories you have
+// @author       Lite_OnE
+// @match        http://steamcommunity.com/*/*/inventory/*
+// @grant        none
+// ==/UserScript==
+
+var Count = $J('[id*=inventory_link_]').length;
+$J('.inventory_links').after('<div class="fraud_warning"><div class="fraud_warning_box"><span>Games Inventory Count: ' + Count + '</span></div></div>');
