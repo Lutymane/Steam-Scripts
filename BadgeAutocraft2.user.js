@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.4.2
+// @version      2.4.3
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -24,7 +24,6 @@ var NumberOfBadgesToCraftOnPage = 0,
     CurrentAppID                = 0,
     Border                      = 0,
     IgnoreFoils                 = false,
-    TemporaryTimeOut            = 0,
     PageNumber                  = 1,
     PostURL                     = '';
 
@@ -111,7 +110,7 @@ function ToggleAutocraft(i)
     }
 
     BadgeNumber = i + 1;
-    ModalInfo = ShowBlockingWaitDialog("Crafting on a current page...", "Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed! XP earned: " + LevelsCrafted*100 + " Badges skipped: " + BadgesSkipped);
+    ModalInfo = ShowBlockingWaitDialog("Crafting on a current page...", "<span style=\"color:CadetBlue;\">Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed!</span> <span style=\"color: mistyrose;\">Earned during session: " + LevelsCrafted*100 + "XP</span> <span style=\"color: IndianRed;\">Badges skipped: " + BadgesSkipped + "</span>");
 
     CurrentAppID = $('.badge_craft_button').eq(i).attr('href').split('/')[6].split('?')[0];
 
@@ -121,16 +120,11 @@ function ToggleAutocraft(i)
     {
         BadgesSkipped++;
 
-        TemporaryTimeOut = 0;
-
         if (BadgeNumber < NumberOfBadgesToCraftOnPage)
         {
-            setTimeout(function (){
-                ModalInfo.Dismiss();
-                i++;
-                ToggleAutocraft(i);
-            }, TemporaryTimeOut);
-
+            ModalInfo.Dismiss();
+            i++;
+            ToggleAutocraft(i);
         }
         else
         {
@@ -155,15 +149,14 @@ function ToggleAutocraft(i)
             console.log('AppID: ' + CurrentAppID + ' | XP: ' + data.Badge.xp);
 
             LevelsCrafted++;
-
-            TemporaryTimeOut = TimeOutValue;
+            window.localStorage.setItem('LevelsCrafted', LevelsCrafted);
 
             if((data.success == 1) && (Border != 1) && (data.Badge.xp != "500"))
             {
                 setTimeout(function (){
                     ModalInfo.Dismiss();
                     ToggleAutocraft(i);
-                }, TemporaryTimeOut);
+                }, TimeOutValue);
             }
             else
             {
@@ -171,7 +164,7 @@ function ToggleAutocraft(i)
                     ModalInfo.Dismiss();
                     i++;
                     ToggleAutocraft(i);
-                }, TemporaryTimeOut);
+                }, TimeOutValue);
             }
         }).fail(function(data){
             try
@@ -194,15 +187,13 @@ function ToggleAutocraft(i)
                 console.log(e);
             }
 
-            TemporaryTimeOut = TimeOutValue;
-
             if (BadgeNumber < NumberOfBadgesToCraftOnPage)
             {
                 setTimeout(function (){
                     ModalInfo.Dismiss();
                     i++;
                     ToggleAutocraft(i);
-                }, TemporaryTimeOut);
+                }, TimeOutValue);
 
             }
             else
@@ -244,8 +235,6 @@ $(document).ready(function(){
         return;
     }
 
-    console.log('Settings are being read...');
-
     if(window.localStorage.getItem('BlackList') != '')
     {
         BlackListAppIDs = window.localStorage.getItem('BlackList').split(',');
@@ -258,6 +247,8 @@ $(document).ready(function(){
 
     if (window.localStorage.getItem('PageFlag') == '1')
     {
+        LevelsCrafted = parseInt(window.localStorage.getItem('LevelsCrafted'));
+
         if (NumberOfBadgesToCraftOnPage > window.localStorage.getItem('Skipped'))
         {
             ToggleAutocraft(0);
@@ -282,8 +273,9 @@ $(document).ready(function(){
             {
                 window.localStorage.setItem('PageFlag', '0');
                 window.localStorage.setItem('Skipped', '0');
+                window.localStorage.getItem('LevelsCrafted', '0');
 
-                ShowAlertDialog ('Info','Crafting is done!');
+                ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during session: ' + LevelsCrafted*100 + " XP</span>");
             }
         }
     }
