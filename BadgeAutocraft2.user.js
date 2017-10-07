@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    *steamcommunity.com/
-// @version      2.4.3
+// @version      2.4.4
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -101,14 +101,6 @@ function IsInBlackList(id)
 function ToggleAutocraft(i)
 {
 
-    if (NumberOfBadgesToCraftOnPage == 0)
-    {
-        window.localStorage.setItem('PageFlag', '0');
-        window.localStorage.setItem('Skipped', '0');
-        ShowAlertDialog("Info","There are no badges to craft!");
-        return;
-    }
-
     BadgeNumber = i + 1;
     ModalInfo = ShowBlockingWaitDialog("Crafting on a current page...", "<span style=\"color:CadetBlue;\">Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed!</span> <span style=\"color: mistyrose;\">Earned during session: " + LevelsCrafted*100 + "XP</span> <span style=\"color: IndianRed;\">Badges skipped: " + BadgesSkipped + "</span>");
 
@@ -160,12 +152,25 @@ function ToggleAutocraft(i)
             }
             else
             {
-                setTimeout(function (){
+                if (BadgeNumber < NumberOfBadgesToCraftOnPage)
+                {
+                    setTimeout(function (){
+                        ModalInfo.Dismiss();
+                        i++;
+                        ToggleAutocraft(i);
+                    }, TimeOutValue);
+    
+                }
+                else
+                {
                     ModalInfo.Dismiss();
-                    i++;
-                    ToggleAutocraft(i);
-                }, TimeOutValue);
-            }
+    
+                    window.localStorage.setItem('PageFlag', '1');
+                    window.localStorage.setItem('Skipped', BadgesSkipped);
+    
+                    window.location.reload();
+                }
+                }
         }).fail(function(data){
             try
             {
@@ -219,7 +224,17 @@ $(document).ready(function(){
     $('#ToggleAutocraft').click(function(){
         if(confirm('Do you want to toggle autocraft?'))
         {
-            ToggleAutocraft(0);
+            if (NumberOfBadgesToCraftOnPage == 0)
+            {
+                window.localStorage.setItem('PageFlag', '0');
+                window.localStorage.setItem('Skipped', '0');
+                ShowAlertDialog("Info","There are no badges to craft!");
+                return;
+            }
+            else
+            {
+                ToggleAutocraft(0);   
+            }
         }
     });
     $('#Settings').click(function(){SettingsModal();});
