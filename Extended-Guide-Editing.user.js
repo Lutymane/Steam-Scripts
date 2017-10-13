@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Extended Guide Editing
-// @version      2.3
+// @namespace    top_xex
+// @version      2.3.1
 // @description  Save guide subsections with empty titles and 'unlimited' body text length.
 // @author       Lite_OnE
 // @match        *steamcommunity.com/sharedfiles/editguidesubsection*
