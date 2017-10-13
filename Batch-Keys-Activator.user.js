@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Batch Keys Activator
-// @namespace    http://tampermonkey.net/
-// @version      1.0.1.1
+// @namespace    top_xex
+// @version      1.0.1.2
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
