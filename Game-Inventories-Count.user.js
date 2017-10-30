@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Game Inventories Count
 // @namespace    top_xex
-// @version      1.4.1
+// @version      1.4.2
 // @description  It shows how many game inventories user has
 // @author       Lite_OnE
-// @match        *://steamcommunity.com/*/*/inventory/*
+// @match        *://steamcommunity.com/*/*/inventory*
 // @grant        none
 // ==/UserScript==
 
