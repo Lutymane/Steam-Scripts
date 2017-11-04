@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Batch Keys Activator
 // @namespace    top_xex
-// @version      1.0.1.2
+// @version      1.0.1.3
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
@@ -83,9 +83,9 @@ function ActivateKey(i)
                 RegisterFailure(0, null, Keys[i]);
             }
 
-            if (i + 1 < KeysAmount)
+            if (++i < KeysAmount)
             {
-                ActivateKey(i + 1); //for some reason ActivateKey(i++) doesn't work .-.
+                ActivateKey(i);
             }
             else
             {
@@ -144,21 +144,28 @@ unsafeWindow.InitKeysRegistration = function()
 
 $(document).ready(function()
 {
-    $('#product_key').replaceWith($('<textarea id="product_key" type="text" class="registerkey_input_box_text" value="">'));
-    KeysTextarea = $('#product_key');
-    KeysTextarea.keydown(function()
-    {
-        setTimeout(function()
+    setTimeout(function(){
+        if($('#es_activate_multiple'))
         {
-            KeysTextarea.css('height', 'auto');
-            KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 'px');
-        }, 0);
-    });
-    KeysTextarea.css('min-width', '470px');
-    KeysTextarea.css('resize', 'vertical');
-    KeysTextarea.css('padding', 0);
-    $('#register_btn').attr('href', 'javascript:InitKeysRegistration();');
-    $('#error_display').css('background-color', 'rgba(255, 255, 255, 0.3)');
-    $('#error_display').css('display', 'none');
-    $('#error_display').css('transition', 'all 3s ease');
+            console.log('Enhanced Steam extension detected.');
+            $('#es_activate_multiple').remove();
+        }
+        $('#product_key').replaceWith($('<textarea id="product_keys" type="text" class="registerkey_input_box_text" value="">'));
+        KeysTextarea = $('#product_keys');
+        KeysTextarea.keydown(function()
+                             {
+            setTimeout(function()
+                       {
+                KeysTextarea.css('height', 'auto');
+                KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 'px');
+            }, 0);
+        });
+        KeysTextarea.css('min-width', '470px');
+        KeysTextarea.css('resize', 'vertical');
+        KeysTextarea.css('padding', 0);
+        $('#register_btn').attr('href', 'javascript:InitKeysRegistration();');
+        $('#error_display').css('background-color', 'rgba(255, 255, 255, 0.3)');
+        $('#error_display').css('display', 'none');
+        $('#error_display').css('transition', 'all 3s ease');
+    }, 500);
 });
