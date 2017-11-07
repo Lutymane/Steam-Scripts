@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    top_xex
-// @version      2.4.5
+// @version      2.4.6
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -115,8 +115,7 @@ function ToggleAutocraft(i)
         if (BadgeNumber < NumberOfBadgesToCraftOnPage)
         {
             ModalInfo.Dismiss();
-            i++;
-            ToggleAutocraft(i);
+            ToggleAutocraft(++i);
         }
         else
         {
@@ -156,8 +155,7 @@ function ToggleAutocraft(i)
                 {
                     setTimeout(function (){
                         ModalInfo.Dismiss();
-                        i++;
-                        ToggleAutocraft(i);
+                        ToggleAutocraft(++i);
                     }, TimeOutValue);
     
                 }
@@ -170,7 +168,7 @@ function ToggleAutocraft(i)
     
                     window.location.reload();
                 }
-                }
+             }
         }).fail(function(data){
             try
             {
@@ -196,8 +194,7 @@ function ToggleAutocraft(i)
             {
                 setTimeout(function (){
                     ModalInfo.Dismiss();
-                    i++;
-                    ToggleAutocraft(i);
+                    ToggleAutocraft(++i);
                 }, TimeOutValue);
 
             }
@@ -246,7 +243,7 @@ $(document).ready(function(){
 
     if(window.localStorage.getItem('BlackList') == null || window.localStorage.getItem('IgnoreFoils') == null)
     {
-        alert("Badge Autocraft script can't read settings values! It may occur because of script got updated. Please set up script's settings again, since they are cleared now");
+        alert("Badge Autocraft script can't read settings values! It may occur because of the script got an update. Please set up script's settings again, since they are cleared now");
         return;
     }
 
