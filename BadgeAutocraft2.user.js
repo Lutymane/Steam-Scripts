@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    top_xex
-// @version      2.4.8
+// @version      2.4.9
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -296,6 +296,8 @@ $(document).ready(function(){
 
     if (window.localStorage.getItem('PageFlag') == '1')
     {
+        window.localStorage.setItem('PageFlag', '0');
+        
         LevelsCrafted = parseInt(window.localStorage.getItem('LevelsCrafted'));
 
         if (NumberOfBadgesToCraftOnPage > window.localStorage.getItem('Skipped'))
