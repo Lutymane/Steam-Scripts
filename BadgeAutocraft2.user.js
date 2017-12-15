@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    top_xex
-// @version      2.4.6
+// @version      2.4.7
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -14,7 +14,7 @@
 
 var NumberOfBadgesToCraftOnPage = 0,
     DataButtons                 = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
-    ModalBlockData              = '<div id="ModalBlock" style="display: none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><input type="text" id="BlackList" style="font-style: italic; margin: 5px;">AppIDs to skip crafting of these badges (appid1, appid2, ...)</div><div><input type="checkbox" id="IgnoreFoilBadges" style="margin: 5px;">Check this if you want to ignore foil badges while crafting</div></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
+    ModalBlockData              = '<div id="ModalBlock" style="display: none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><input type="text" id="BlackList" style="font-style: italic; margin: 5px;">AppIDs to skip crafting of these badges (appid1, appid2, ...)</div><div><input type="checkbox" id="IgnoreFoilBadges" style="margin: 5px;">Ignore foil badges while crafting</div><div><input type="checkbox" id="IgnoreNormalBadges" style="margin: 5px;">Ignore normal badges while crafting</div></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
     BlackListAppIDs             = [],
     TimeOutValue                = 1500,
     ModalInfo                   = null,
@@ -24,6 +24,7 @@ var NumberOfBadgesToCraftOnPage = 0,
     CurrentAppID                = 0,
     Border                      = 0,
     IgnoreFoils                 = false,
+    IgnoreNormal                = false,
     PageNumber                  = 1,
     PostURL                     = '';
 
@@ -54,6 +55,16 @@ function ApplySettings()
         IgnoreFoils = false;
     }
 
+    if($('#IgnoreNormalBadges').prop('checked')){
+        window.localStorage.setItem('IgnoreNormal', 'true');
+        IgnoreNormal = true;
+    }
+    else
+    {
+        window.localStorage.setItem('IgnoreNormal', 'false');
+        IgnoreNormal = false;
+    }
+
     window.localStorage.setItem('BlackList', BlackListAppIDs);
 
     $('#ModalBlock').css('display', 'none');
@@ -63,12 +74,16 @@ function ResetSettings()
 {
     window.localStorage.setItem('BlackList', '');
     window.localStorage.setItem('IgnoreFoils', 'false');
+    window.localStorage.setItem('IgnoreNormal', 'false');
 
     BlackListAppIDs = [];
     $('#BlackList').val('');
 
     IgnoreFoils = false;
     $('#IgnoreFoilBadges').prop('checked', false);
+
+    IgnoreNormal = false;
+    $('#IgnoreNormalBadges').prop('checked', false);
 }
 
 function SettingsModal()
@@ -84,6 +99,15 @@ function SettingsModal()
     else
     {
         $('#IgnoreFoilBadges').prop('checked', false);
+    }
+
+    if(window.localStorage.getItem('IgnoreNormal') == 'true')
+    {
+        $('#IgnoreNormalBadges').prop('checked', true);
+    }
+    else
+    {
+        $('#IgnoreNormalBadges').prop('checked', false);
     }
 }
 
@@ -102,13 +126,13 @@ function ToggleAutocraft(i)
 {
 
     BadgeNumber = i + 1;
-    ModalInfo = ShowBlockingWaitDialog("Crafting on a current page...", "<span style=\"color:CadetBlue;\">Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed!</span> <span style=\"color: mistyrose;\">Earned during session: " + LevelsCrafted*100 + "XP</span> <span style=\"color: IndianRed;\">Badges skipped: " + BadgesSkipped + "</span>");
+    ModalInfo = ShowBlockingWaitDialog("Crafting on a current page...", "<span style=\"color:CadetBlue;\">Badge " + BadgeNumber + "/" + NumberOfBadgesToCraftOnPage + " is being processed!</span><br><span style=\"color: mistyrose;\">Earned during the session: " + LevelsCrafted*100 + "XP</span><br><span style=\"color: IndianRed;\">Badges skipped: " + BadgesSkipped + "</span>");
 
     CurrentAppID = $('.badge_craft_button').eq(i).attr('href').split('/')[6].split('?')[0];
 
     if ($('.badge_craft_button').eq(i).attr('href').includes("?border=1")) Border = 1; else Border = 0;
 
-    if (IsInBlackList(CurrentAppID) || (Border == 1 && IgnoreFoils == true))
+    if (IsInBlackList(CurrentAppID) || (Border == 1 && IgnoreFoils == true) || (Border == 0 && IgnoreNormal == true))
     {
         BadgesSkipped++;
 
@@ -221,16 +245,24 @@ $(document).ready(function(){
     $('#ToggleAutocraft').click(function(){
         if(confirm('Do you want to toggle autocraft?'))
         {
-            if (NumberOfBadgesToCraftOnPage == 0)
+            if(IgnoreFoils && IgnoreNormal)
             {
-                window.localStorage.setItem('PageFlag', '0');
-                window.localStorage.setItem('Skipped', '0');
-                ShowAlertDialog("Info","There are no badges to craft!");
+                ShowAlertDialog("Info","Oops... You can't ignore normal badges and foil badges at the same time!<br>Check your settings, please");
                 return;
             }
             else
             {
-                ToggleAutocraft(0);   
+                if (NumberOfBadgesToCraftOnPage == 0)
+                {
+                    window.localStorage.setItem('PageFlag', '0');
+                    window.localStorage.setItem('Skipped', '0');
+                    ShowAlertDialog("Info","There are no badges to craft!");
+                    return;
+                }
+                else
+                {
+                    ToggleAutocraft(0);
+                }
             }
         }
     });
@@ -241,7 +273,7 @@ $(document).ready(function(){
 
     NumberOfBadgesToCraftOnPage = $('.badge_craft_button').length;
 
-    if(window.localStorage.getItem('BlackList') == null || window.localStorage.getItem('IgnoreFoils') == null)
+    if(window.localStorage.getItem('BlackList') == null || window.localStorage.getItem('IgnoreFoils') == null || window.localStorage.getItem('IgnoreNormal') == null)
     {
         alert("Badge Autocraft script can't read settings values! It may occur because of the script got an update. Please set up script's settings again, since they are cleared now");
         return;
@@ -255,6 +287,11 @@ $(document).ready(function(){
     if(window.localStorage.getItem('IgnoreFoils') == 'true')
     {
         IgnoreFoils = true;
+    }
+
+    if(window.localStorage.getItem('IgnoreNormal') == 'true')
+    {
+        IgnoreNormal = true;
     }
 
     if (window.localStorage.getItem('PageFlag') == '1')
