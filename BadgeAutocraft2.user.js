@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    top_xex
-// @version      2.4.7
+// @version      2.4.8
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -147,6 +147,7 @@ function ToggleAutocraft(i)
 
             window.localStorage.setItem('PageFlag', '1');
             window.localStorage.setItem('Skipped', BadgesSkipped);
+            window.localStorage.setItem('LevelsCrafted', LevelsCrafted);
 
             window.location.reload();
         }
@@ -163,8 +164,7 @@ function ToggleAutocraft(i)
 
             console.log('AppID: ' + CurrentAppID + ' | XP: ' + data.Badge.xp);
 
-            LevelsCrafted++;
-            window.localStorage.setItem('LevelsCrafted', LevelsCrafted);
+            window.localStorage.setItem('LevelsCrafted', ++LevelsCrafted);
 
             if((data.success == 1) && (Border != 1) && (data.Badge.xp != "500"))
             {
@@ -322,9 +322,16 @@ $(document).ready(function(){
             {
                 window.localStorage.setItem('PageFlag', '0');
                 window.localStorage.setItem('Skipped', '0');
-                window.localStorage.getItem('LevelsCrafted', '0');
+                window.localStorage.setItem('LevelsCrafted', '0');
 
-                ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during session: ' + LevelsCrafted*100 + " XP</span>");
+                if(LevelsCrafted == 0)
+                {
+                    ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during session: ' + LevelsCrafted*100 + " XP</span><br><span style=\"color: Red;\">It seems, that you set up the script wrong. Please, check the settings</span>");
+                }
+                else
+                {
+                    ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during session: ' + LevelsCrafted*100 + " XP</span>");
+                }
             }
         }
     }
