@@ -328,11 +328,11 @@ $(document).ready(function(){
 
                 if(LevelsCrafted == 0)
                 {
-                    ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during session: ' + LevelsCrafted*100 + " XP</span><br><span style=\"color: Red;\">It seems, that you set up the script wrong. Please, check the settings</span>");
+                    ShowAlertDialog ('Info', '<span style=\"color: Red;\">It seems, that you\'ve set up the script wrong. Please, check the settings</span>");
                 }
                 else
                 {
-                    ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during session: ' + LevelsCrafted*100 + " XP</span>");
+                    ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during the session: ' + LevelsCrafted*100 + " XP</span>");
                 }
             }
         }
