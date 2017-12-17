@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Badge Autocraft 2
 // @namespace    top_xex
-// @version      2.4.9
+// @version      2.5
 // @description  Thanks to Psy0ch and MrSteakPotato for testing! Inspired by 10101000's Steam-AutoCraft. Allows you to craft remaining badges in one click. Works much more faster, takes much less resources.
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/*/*/badges/
@@ -16,7 +16,7 @@ var NumberOfBadgesToCraftOnPage = 0,
     DataButtons                 = '<div class="btn_grey_black btn_small_thin" id="ToggleAutocraft"><span>Toggle Autocraft</span></div><div class="btn_grey_black btn_small_thin" id="Settings"><span>&#9881;</span></div>',
     ModalBlockData              = '<div id="ModalBlock" style="display: none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><input type="text" id="BlackList" style="font-style: italic; margin: 5px;">AppIDs to skip crafting of these badges (appid1, appid2, ...)</div><div><input type="checkbox" id="IgnoreFoilBadges" style="margin: 5px;">Ignore foil badges while crafting</div><div><input type="checkbox" id="IgnoreNormalBadges" style="margin: 5px;">Ignore normal badges while crafting</div></div><div class="newmodal_buttons"><div class="btn_grey_white_innerfade btn_medium" id="ApplySettings"><span>Apply</span></div><div class="btn_grey_white_innerfade btn_medium" id="ResetSettings"><span>Reset</span></div></div></div></div></div></div>',
     BlackListAppIDs             = [],
-    TimeOutValue                = 1500,
+    TimeOutValue                = 200,
     ModalInfo                   = null,
     BadgeNumber                 = 0,
     LevelsCrafted               = 0,
@@ -328,11 +328,13 @@ $(document).ready(function(){
 
                 if(LevelsCrafted == 0)
                 {
-                    ShowAlertDialog ('Info', '<span style=\"color: Red;\">It seems, that you\'ve set up the script wrong. Please, check the settings</span>");
+                    ShowAlertDialog ('Info', '<span style=\"color: Red;\">It seems, that you\'ve set up the script wrong. Please, check the settings</span>');
+                    LevelsCrafted = 0;
                 }
                 else
                 {
                     ShowAlertDialog ('Info','Crafting is done!<br><span style=\"color: PaleVioletRed;\">Earned during the session: ' + LevelsCrafted*100 + " XP</span>");
+                    LevelsCrafted = 0;
                 }
             }
         }
