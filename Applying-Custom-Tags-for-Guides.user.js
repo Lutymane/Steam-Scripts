@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         Applying Custom Tags to Guides
+// @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.0
+// @version      1.1
 // @description  It allows you to apply custom tags to guides, as well as multiple language tags
 // @author       Lite_OnE
 // @match        *://steamcommunity.com/sharedfiles/editguide/*
