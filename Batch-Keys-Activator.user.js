@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         Batch Keys Activator
+// @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.0.1.3
+// @version      1.1
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
