@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.1
+// @version      1.2
 // @description  Activate a bunch of keys at once
 // @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
 // @author       Lite_OnE
@@ -153,6 +153,7 @@ $(document).ready(function()
         }
         $('#product_key').replaceWith($('<textarea id="product_keys" type="text" class="registerkey_input_box_text" value="">'));
         KeysTextarea = $('#product_keys');
+        KeysTextarea.text(location.href.split('key=')[1].split('&')[0]);
         KeysTextarea.keydown(function()
                              {
             setTimeout(function()
