@@ -2,28 +2,33 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.4
-// @description  Activate a bunch of keys at once
-// @thanks       Many thanks to Delite for helping with some css stuff, motivation and testing.
+// @version      1.7
+// @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
 // @match        https://www.indiegala.com/profile?user_id=*
-// @grant        unsafeWindow
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
+// @match        https://www.gogobundle.com/latest/bundles/order/show/cid-*
+// @match        https://www.gogobundle.com/account/order/show/cid-*
+// @match        https://otakubundle.com/latest/bundles/order/show/cid-*
+// @match        https://otakubundle.com/account/order/show/cid-*
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
-var Keys          = [];
-var KeysAmount    = 0;
-var KeysTextarea  = null;
-//
-var KeysData      = [];
-var ConsoleCSS    = 'color:#176087; font-size: 13px; background-color: #e0aaff';
-//IndieGala
-var IG_ButtonData = '<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register all the bundle keys on Steam</a>';
-var IG_Codes      = [];
+var Keys                  = [];
+var AlreadyOwnedGame_Keys = [];
+var Unprocessed_Keys      = [];
+var OtherFailed_Keys      = [];
+var bLimitExceeded        = false;
+var KeysAmount            = 0;
+var KeysTextarea          = null;
+var LogDisplay            = null;
+//Collect Keys from bundle sites here
+var KeysData              = [];
+//Fancy Console
+var ConsoleCSS            = 'color:#176087; font-size: 13px; background-color: #e0aaff';
 
 function RegisterFailure(ePurchaseResult, receipt, key)
 {
-    var sErrorMessage = 'An unexpected error has occurred.  Your product code has not been redeemed.  Please wait 30 minutes and try redeeming the code again.  If the problem persists, please contact <a href="https://help.steampowered.com/en/wizard/HelpWithCDKey">Steam Support</a> for further assistance.';
+    var sErrorMessage = '';
 
     switch (ePurchaseResult)
     {
@@ -60,12 +65,28 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             break;
 
         case 4: //???
+            sErrorMessage = 'An error has occurred.  Code (4). Valve add a description, please';
+            break;
+
         default:
             sErrorMessage = 'An unexpected error has occurred.  Your product code has not been redeemed.  Please wait 30 minutes and try redeeming the code again.  If the problem persists, please contact <a href="https://help.steampowered.com/en/wizard/HelpWithCDKey">Steam Support</a> for further assistance.';
             break;
     }
 
-    $('#error_display').append('<br><br><hr><br>' + key + "<br><br>Failed! " + sErrorMessage);
+    switch (ePurchaseResult)
+    {
+        case 53:
+            bLimitExceeded = true;
+            break;
+        case 9:
+            AlreadyOwnedGame_Keys.push(key);
+            break;
+        default:
+            OtherFailed_Keys.push(key);
+            break;
+    }
+
+    LogDisplay.append('<br><br><hr><br>' + key + "<br><br>Failed! " + sErrorMessage);
 }
 
 function ActivateKey(i)
@@ -80,7 +101,7 @@ function ActivateKey(i)
         {
             if (Result.success == 1)
             {
-                $('#error_display').append('<br><br><hr><br>' + Keys[i] + '<br><br>Success! Product: "' + Result.purchase_receipt_info.line_items[0].line_item_description + '" has been added to your account.');
+                LogDisplay.append('<br><br><hr><br>' + Keys[i] + '<br><br>Success! Product: "' + Result.purchase_receipt_info.line_items[0].line_item_description + '" has been added to your account.');
             }
             else if (Result.purchase_result_details !== undefined && Result.purchase_receipt_info !== undefined)
             {
@@ -91,62 +112,138 @@ function ActivateKey(i)
                 RegisterFailure(0, null, Keys[i]);
             }
 
+            LogDisplay.animate({
+                scrollTop: LogDisplay[0].scrollHeight
+            }, 1000);
+
+            if(bLimitExceeded)
+            {
+                for(var j = i; j < KeysAmount; j++)
+                {
+                    Unprocessed_Keys.push(Keys[j]);
+                }
+
+                OnActivationProcessFinished();
+
+                return;
+            }
+
             if (++i < KeysAmount)
             {
                 ActivateKey(i);
             }
             else
             {
-                $('#error_display').append('<br><br><hr><br>Done. All the keys have been processed!');
-                $('#error_display').css('background-color', 'rgba(53, 142, 255, 0.3)');
+                OnActivationProcessFinished();
                 return;
             }
         }
     }).fail(function()
     {
-        $('#error_display').append('<br><br><hr><br>Unexpected error! Try to activate later...');
+        LogDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
+        LogDisplay.append('<br><br><hr><br>Unexpected error! Try to activate later...');
         return;
     });
 }
 
+function OnActivationProcessFinished()
+{
+    LogDisplay.append('<br><br><hr><br>');
+//yellow (253,215,51)
+    if(Unprocessed_Keys.length == 0)
+    {
+        if((AlreadyOwnedGame_Keys.length != 0) || (OtherFailed_Keys.length != 0))
+        {
+            LogDisplay.css('background-color', 'rgba(253,215,51,0.3)');//yellow
+            LogDisplay.append('Done! All the keys have been processed, but some of the keys have failed to be activated:');
+
+            if(AlreadyOwnedGame_Keys.length != 0)
+            {
+                LogDisplay.append('<br><br>Already Owned Game Keys:<br>' + AlreadyOwnedGame_Keys.join());
+            }
+
+            if(OtherFailed_Keys.length != 0)
+            {
+                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>' + OtherFailed_Keys.join());
+            }
+        }
+        else
+        {
+            LogDisplay.css('background-color', 'rgba(22, 230, 22, 0.3)');//green
+            LogDisplay.append('Done! All the keys have been processed and activated successfully!');
+        }
+    }
+    else
+    {
+        if((AlreadyOwnedGame_Keys.length != 0) || (OtherFailed_Keys.length != 0))
+        {
+            LogDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
+            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Also some of the keys have failed to be activated:');
+
+            if(AlreadyOwnedGame_Keys.length != 0)
+            {
+                LogDisplay.append('<br><br>Already Owned Game Keys:<br>' + AlreadyOwnedGame_Keys.join());
+            }
+
+            if(OtherFailed_Keys.length != 0)
+            {
+                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>' + OtherFailed_Keys.join());
+            }
+        }
+        else
+        {
+            LogDisplay.css('background-color', 'rgba(255,174,25, 0.3)');//orange
+            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated:');
+        }
+
+        LogDisplay.append('<br><br>Unprocessed keys:<br>' + Unprocessed_Keys.join());
+    }
+}
+
 function CleanArray(Source)
 {
-    var newArray = [],
-        newArray2 = [];
+    var CleanedArray = [],
+        NestedArray = [];
     for (var i = 0; i < Source.length; i++)
     {
         if (Source[i])
         {
-            newArray2 = Source[i].replace(/\s+/g, '').split(',');
-            for (var j = 0; j < newArray2.length; j++)
+            NestedArray = Source[i].replace(/\s+/g, '').split(',');
+            for (var j = 0; j < NestedArray.length; j++)
             {
-                if (newArray2[j])
+                if (NestedArray[j])
                 {
-                    newArray.push(newArray2[j]);
+                    CleanedArray.push(NestedArray[j]);
                 }
             }
         }
     }
-    return newArray;
+    return CleanedArray;
 }
 
-unsafeWindow.InitializeKeysRegistration = function()
+function InitializeKeysRegistration()
 {
-    $('#error_display').css('display', 'inherit');
+    LogDisplay.css('display', 'inherit');
     if ($('#product_key').val() != "" && $('#accept_ssa').is(':checked'))
     {
         Keys = CleanArray(KeysTextarea.val().split('\n'));
         KeysAmount = Keys.length;
-        $('#error_display').text('Processing given keys...');
+        LogDisplay.text('Processing given keys...');
+
+        AlreadyOwnedGame_Keys = [];
+        Unprocessed_Keys      = [];
+        OtherFailed_Keys      = [];
+        bLimitExceeded        = false;
+
         ActivateKey(0);
     }
     else if (!($('#accept_ssa').is(':checked')))
     {
-        $('#error_display').html('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
+        LogDisplay.html('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
     }
     else
     {
-        $('#error_display').text('You must input at least one key!');
+        LogDisplay.text('You must input at least one key!');
     }
 };
 
@@ -156,63 +253,89 @@ $(document).ready(function()
     {
         IndieGalaProcess();
     }
+    else if (location.href.includes("gogobundle") || location.href.includes("otakubundle"))
+    {
+        OtakuGogoProcess();
+    }
     else
     {
         setTimeout(function(){
-        if($('#es_activate_multiple'))
-        {
-            console.log('%c Batch Keys Activator | Enhanced Steam extension detected. Removing ES stuff... ', ConsoleCSS);
-            $('#es_activate_multiple').remove();
-            console.log('%c Batch Keys Activator | Done! ', ConsoleCSS);
-        }
-
-        $('#product_key').replaceWith($('<textarea id="product_keys" type="text" class="registerkey_input_box_text" value="">'));
-        KeysTextarea = $('#product_keys');
-
-        if(location.href.match(/key=./))
-        {
-            KeysTextarea.text(location.href.split('key=')[1].split('&')[0]);
-        }
-        else if(location.href.match(/keys=./))
-        {
-            KeysTextarea.text(location.href.split('keys=')[1].split('&')[0]);
-        }
-
-        KeysTextarea.keydown(function()
-        {
-            setTimeout(function()
+            if($('#es_activate_multiple').length)
             {
-                KeysTextarea.css('height', 'auto');
-                KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 'px');
-            }, 0);
-        });
-        KeysTextarea.css('min-width', '470px');
-        KeysTextarea.css('resize', 'vertical');
-        KeysTextarea.css('padding', 0);
-
-        $('#register_btn').attr('href', 'javascript:InitializeKeysRegistration();');
-        $('#error_display').css('background-color', 'rgba(255, 255, 255, 0.3)');
-        $('#error_display').css('display', 'none');
-        $('#error_display').css('transition', 'all 3s ease');
-
-        if(location.href.match(/auto=./))
-        {
-            if(location.href.split('auto=')[1].split('&')[0] == '1')
-            {
-                $('#error_display').css('display', 'inherit');
-                Keys = CleanArray(KeysTextarea.val().split('\n'));
-                KeysAmount = Keys.length;
-                $('#error_display').text('Processing given keys...');
-                ActivateKey(0);
+                console.log('%c Batch Keys Activator | Enhanced Steam extension detected. Removing ES stuff... ', ConsoleCSS);
+                $('#es_activate_multiple').remove();
             }
-        }
+
+            //adding nice scrollbars. strange that it's not used everywhere on steam .-.
+            $('head').append('<link href="https://steamcommunity-a.akamaihd.net/public/css/webui/shared_application.css" rel="stylesheet" type="text/css">');
+
+            $('#product_key').replaceWith($('<textarea id="product_keys" type="text" class="registerkey_input_box_text" value="">'));
+            KeysTextarea = $('#product_keys');
+
+            if(location.href.match(/key=./))
+            {
+                KeysTextarea.text(location.href.split('key=')[1].split('&')[0]);
+            }
+            else if(location.href.match(/keys=./))
+            {
+                KeysTextarea.text(location.href.split('keys=')[1].split('&')[0]);
+            }
+
+            KeysTextarea.keydown(function(){
+                setTimeout(function(){
+                    KeysTextarea.css('height', 'auto');
+                    KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 10 + 'px');
+                }, 0);
+            });
+            KeysTextarea.css('min-width', '470px');
+            KeysTextarea.css('resize', 'vertical');
+            KeysTextarea.css('padding', 0);
+
+            KeysTextarea.css('max-height', '300px');
+            KeysTextarea.css('height', 'auto');
+            KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 10 + 'px');
+
+            $('#register_btn').removeAttr('href');
+            $('#register_btn').click(function(){InitializeKeysRegistration();});
+
+            LogDisplay = $('#error_display');
+            LogDisplay.css('max-height', '400px');
+            LogDisplay.css('overflow','auto');
+            LogDisplay.css('background-color', 'rgba(255, 255, 255, 0.3)');
+            LogDisplay.css('display', 'none');
+            LogDisplay.css('transition', 'all 3s ease');
+
+            if(location.href.match(/auto=./))
+            {
+                if(location.href.split('auto=')[1].split('&')[0] == '1')
+                {
+                    LogDisplay.css('display', 'inherit');
+                    Keys = CleanArray(KeysTextarea.val().split('\n'));
+                    KeysAmount = Keys.length;
+                    LogDisplay.text('Processing given keys...');
+                    ActivateKey(0);
+                }
+            }
         }, 500);
     }
 });
 
+//***********************************
+//***********Bundle Sites************
+//***********************************
+
+function Bundle_ProcessKeys()
+{
+    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join());// + '&auto=1');
+    wnd.focus();
+}
+
+//************IndieGala**************
+var IG_Codes = [];
+
 function IndieGalaProcess()
 {
-    $('#steam-account').append(IG_ButtonData);
+    $('#steam-account').append('<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register all the bundle keys on Steam</a>');
 
     $('#RegisterKeysIndieGala').click(function(){
 
@@ -260,7 +383,23 @@ function IndieGalaFetchKey(i)
     else
     {
         $('#RegisterKeysIndieGala').contents().last().replaceWith(' Done! Redirecting to Steam...');
-        var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join() + '&auto=1');
-        wnd.focus();
+        Bundle_ProcessKeys();
     }
+}
+
+//*********Otaku/Gogobundle**********
+function OtakuGogoProcess()
+{
+    var keys_table = $('.hikashop_order_main_table tbody tr td fieldset table tbody').eq(1).find('tr td');
+
+    $('.hikashop_order_main_table tbody tr td fieldset legend').eq(2).before('<div href="javascript://" id="ActivateKeys" class="btn">Fetch and Activate Keys</div>');
+
+    $('#ActivateKeys').click(function(){
+        for(var i = 1; i < keys_table.length; i+=4)
+        {
+            KeysData.push(keys_table.eq(i).text());
+        }
+
+        Bundle_ProcessKeys();
+    });
 }
