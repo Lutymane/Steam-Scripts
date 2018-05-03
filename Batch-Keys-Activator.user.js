@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.7
+// @version      1.8
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -11,6 +11,7 @@
 // @match        https://www.gogobundle.com/account/order/show/cid-*
 // @match        https://otakubundle.com/latest/bundles/order/show/cid-*
 // @match        https://otakubundle.com/account/order/show/cid-*
+// @match        https://www.fanatical.com/*/orders/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 var Keys                  = [];
@@ -24,7 +25,7 @@ var LogDisplay            = null;
 //Collect Keys from bundle sites here
 var KeysData              = [];
 //Fancy Console
-var ConsoleCSS            = 'color:#176087; font-size: 13px; background-color: #e0aaff';
+var ConsoleCSS            = 'color:#FFE4E1; font-size: 15px; font-family: raleway; background-color: #F14D39';
 
 function RegisterFailure(ePurchaseResult, receipt, key)
 {
@@ -245,17 +246,21 @@ function InitializeKeysRegistration()
     {
         LogDisplay.text('You must input at least one key!');
     }
-};
+}
 
 $(document).ready(function()
 {
-    if(location.href.includes("indiegala"))
+    if(location.href.includes("indiegala.com"))
     {
         IndieGalaProcess();
     }
-    else if (location.href.includes("gogobundle") || location.href.includes("otakubundle"))
+    else if (location.href.includes("gogobundle.com") || location.href.includes("otakubundle.com"))
     {
         OtakuGogoProcess();
+    }
+    else if (location.href.includes("fanatical.com"))
+    {
+        FanaticalProcess();
     }
     else
     {
@@ -326,7 +331,7 @@ $(document).ready(function()
 
 function Bundle_ProcessKeys()
 {
-    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join());// + '&auto=1');
+    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join() /* + '&auto=1'*/); //you may uncomment 'auto' parameter to start redeeming the keys immediately
     wnd.focus();
 }
 
@@ -349,7 +354,7 @@ function IndieGalaProcess()
         }
 
         var serials = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=serial_]');
-        for(var i = 0; i < serials.length; i++)
+        for(i = 0; i < serials.length; i++)
         {
             IG_Codes.push(serials.eq(i).attr('id').split('_')[1]);
         }
@@ -392,7 +397,7 @@ function OtakuGogoProcess()
 {
     var keys_table = $('.hikashop_order_main_table tbody tr td fieldset table tbody').eq(1).find('tr td');
 
-    $('.hikashop_order_main_table tbody tr td fieldset legend').eq(2).before('<div href="javascript://" id="ActivateKeys" class="btn">Fetch and Activate Keys</div>');
+    $('.hikashop_order_main_table tbody tr td fieldset legend').eq(2).before('<div href="javascript://" id="ActivateKeys" class="btn">Fetch and Activate All the Keys on Steam</div>');
 
     $('#ActivateKeys').click(function(){
         for(var i = 1; i < keys_table.length; i+=4)
@@ -402,4 +407,38 @@ function OtakuGogoProcess()
 
         Bundle_ProcessKeys();
     });
+}
+
+//***********Fanatical*****************
+function FanaticalProcess()
+{
+    setTimeout(function(){
+        $('.account-content').find('h3').after('<button type="button" id="activate" class="btn btn-secondary btn-block">Fetch and Activate All the Keys on Steam</button>');
+        $('#activate').click(function(){
+            var reveal = $('.account-content').find('dl [type=button].btn.btn-secondary.btn-block');
+
+            for (var i = 0; i < reveal.length; i++)
+            {
+                $('#activate').text('Fetching keys ' + i + '\\' + reveal.length);
+                reveal.eq(i).click();
+            }
+
+            $('#activate').text('Fetching keys... Done!');
+
+            setTimeout(function(){
+                $('#activate').text('Processing keys...');
+
+                var data = $('input[type=text].text-center.font-weight-bold.form-control');
+
+                for (var j = 0; j < data.length; j++)
+                {
+                    KeysData.push(data.eq(j).attr('value'));
+                }
+
+                Bundle_ProcessKeys();
+
+                $('#activate').text('Redirecting to Steam... Done!');
+            }, 1500);
+        });
+    }, 1500);
 }
