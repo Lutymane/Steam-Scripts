@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.8
+// @version      2.0
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -12,6 +12,7 @@
 // @match        https://otakubundle.com/latest/bundles/order/show/cid-*
 // @match        https://otakubundle.com/account/order/show/cid-*
 // @match        https://www.fanatical.com/*/orders/*
+// @match        https://www.humblebundle.com/downloads?key=*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 var Keys                  = [];
@@ -250,17 +251,23 @@ function InitializeKeysRegistration()
 
 $(document).ready(function()
 {
-    if(location.href.includes("indiegala.com"))
+    var href = location.href.toLowerCase();
+
+    if(href.includes("indiegala.com"))
     {
         IndieGalaProcess();
     }
-    else if (location.href.includes("gogobundle.com") || location.href.includes("otakubundle.com"))
+    else if (href.includes("gogobundle.com") || href.includes("otakubundle.com"))
     {
         OtakuGogoProcess();
     }
-    else if (location.href.includes("fanatical.com"))
+    else if (href.includes("fanatical.com"))
     {
         FanaticalProcess();
+    }
+    else if(href.includes("humblebundle.com"))
+    {
+        HumbleBundleProcess();
     }
     else
     {
@@ -332,7 +339,15 @@ $(document).ready(function()
 function Bundle_ProcessKeys()
 {
     var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join() /* + '&auto=1'*/); //you may uncomment 'auto' parameter to start redeeming the keys immediately
-    wnd.focus();
+
+    try
+    {
+        wnd.focus();
+    }
+    catch(e)
+    {
+        alert("Pop-up Blocker is enabled! The script won't be able to redirect you to Steam until you have the Pop-up blocker enabled for this site!");
+    }
 }
 
 //************IndieGala**************
@@ -441,4 +456,31 @@ function FanaticalProcess()
             }, 1500);
         });
     }, 1500);
+}
+
+//***********HumbleBundle**************
+function HumbleBundleProcess()
+{
+    setTimeout(function(){
+        $('.key-list').before('<div id="ActivateOnSteam" class="round-active-button">Redeem and Activate the Keys on Steam</a>');
+
+        $('#ActivateOnSteam').click(function(){
+            $('#ActivateOnSteam').text('Redeeming...');
+
+            $('.keyfield-value').each(function(){
+                $(this).click();
+            });
+
+            setTimeout(function(){
+                $('#ActivateOnSteam').text('Fetching...');
+
+                $('.keyfield.redeemed').each(function(){
+                    KeysData.push($(this).attr('title'));
+                });
+
+                $('#ActivateOnSteam').text('Done! Redirecting to Steam...');
+                Bundle_ProcessKeys();
+            }, 3000);
+        });
+    }, 2000);
 }
