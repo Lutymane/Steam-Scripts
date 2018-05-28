@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.0
+// @version      2.0.1
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -40,6 +40,10 @@ function RegisterFailure(ePurchaseResult, receipt, key)
 
         case 15:
             sErrorMessage = 'The product code you\'ve entered has already been activated by a different Steam account. This code cannot be used again. Please contact the retailer or online seller where the code was purchased for assistance.';
+            break;
+
+        case 16:
+            sErrorMessage = 'batched request timeout';
             break;
 
         case 53:
