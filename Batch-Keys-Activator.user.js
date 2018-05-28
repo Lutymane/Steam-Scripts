@@ -43,7 +43,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             break;
 
         case 16:
-            sErrorMessage = 'batched request timeout';
+            sErrorMessage = 'Batched request timeout';
             break;
 
         case 53:
