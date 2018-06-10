@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.0.1
+// @version      2.1.0
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -71,7 +71,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             break;
 
         case 4: //???
-            sErrorMessage = 'An error has occurred.  Code (4). Valve add a description, please';
+            sErrorMessage = 'An error has occurred.  Code (4). Valve, add a description, please';
             break;
 
         default:
@@ -206,33 +206,44 @@ function OnActivationProcessFinished()
     }
 }
 
-function CleanArray(Source)
+function DeserializeKeys(Source)
 {
-    var CleanedArray = [],
-        NestedArray = [];
-    for (var i = 0; i < Source.length; i++)
-    {
-        if (Source[i])
+    var Output = [];
+    Source.forEach(
+        function(elm)
         {
-            NestedArray = Source[i].replace(/\s+/g, '').split(',');
-            for (var j = 0; j < NestedArray.length; j++)
+            if (elm)
             {
-                if (NestedArray[j])
-                {
-                    CleanedArray.push(NestedArray[j]);
-                }
+                elm.replace(/\s+/g, '').split(',').forEach(
+                    function(elm2)
+                    {
+                        if (elm2)
+                        {
+                            Output.push(elm2);
+                        }
+                    });
             }
-        }
-    }
-    return CleanedArray;
+        });
+    return Output;
 }
 
 function InitializeKeysRegistration()
 {
     LogDisplay.css('display', 'inherit');
-    if ($('#product_key').val() != "" && $('#accept_ssa').is(':checked'))
+    if (KeysTextarea.val() != "" && $('#accept_ssa').is(':checked'))
     {
-        Keys = CleanArray(KeysTextarea.val().split('\n'));
+        switch($('#method :selected').val())
+        {
+            case 'rgx':
+                Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+                break;
+            case 'def':
+                Keys = DeserializeKeys(KeysTextarea.val().split('\n'));
+                break;
+            default:
+                return;
+        }
+
         KeysAmount = Keys.length;
         LogDisplay.text('Processing given keys...');
 
@@ -308,11 +319,14 @@ $(document).ready(function()
             KeysTextarea.css('padding', 0);
 
             KeysTextarea.css('max-height', '300px');
+            KeysTextarea.css('min-height', '57px');
             KeysTextarea.css('height', 'auto');
             KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 10 + 'px');
 
             $('#register_btn').removeAttr('href');
             $('#register_btn').click(function(){InitializeKeysRegistration();});
+
+            $('#register_btn').after('<select name="method" id="method" class="gray_bevel dynInput" style="width:95px;height:32px;margin-left: 12px;"><option value="rgx">Regex</option><option value="def">Default</option></select>');
 
             LogDisplay = $('#error_display');
             LogDisplay.css('max-height', '400px');
@@ -335,6 +349,7 @@ $(document).ready(function()
         }, 500);
     }
 });
+
 
 //***********************************
 //***********Bundle Sites************
