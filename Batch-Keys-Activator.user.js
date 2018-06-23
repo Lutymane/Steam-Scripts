@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.1.0
+// @version      2.2.0
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -13,6 +13,7 @@
 // @match        https://otakubundle.com/account/order/show/cid-*
 // @match        https://www.fanatical.com/*/orders/*
 // @match        https://www.humblebundle.com/downloads?key=*
+// @match        https://groupbundl.es/buy/*
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 var Keys                  = [];
@@ -27,6 +28,10 @@ var LogDisplay            = null;
 var KeysData              = [];
 //Fancy Console
 var ConsoleCSS            = 'color:#FFE4E1; font-size: 15px; font-family: raleway; background-color: #F14D39';
+//**********************************************
+//You can change it to true for auto activating. Keep in mind, that if you use this, you automatically agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
+var AutoActivate          = false;
+//**********************************************
 
 function RegisterFailure(ePurchaseResult, receipt, key)
 {
@@ -71,7 +76,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             break;
 
         case 4: //???
-            sErrorMessage = 'An error has occurred.  Code (4). Valve, add a description, please';
+            sErrorMessage = 'An error has occurred. Code (4). No Description Provided by Valve!';
             break;
 
         default:
@@ -284,6 +289,10 @@ $(document).ready(function()
     {
         HumbleBundleProcess();
     }
+    else if(href.includes("groupbundl.es"))
+    {
+        GroupBundlesProcess();
+    }
     else
     {
         setTimeout(function(){
@@ -339,8 +348,9 @@ $(document).ready(function()
             {
                 if(location.href.split('auto=')[1].split('&')[0] == '1')
                 {
+                    $('#accept_ssa').prop('checked', true);//If you use auto, you agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
                     LogDisplay.css('display', 'inherit');
-                    Keys = CleanArray(KeysTextarea.val().split('\n'));
+                    Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
                     KeysAmount = Keys.length;
                     LogDisplay.text('Processing given keys...');
                     ActivateKey(0);
@@ -351,13 +361,13 @@ $(document).ready(function()
 });
 
 
-//***********************************
-//***********Bundle Sites************
-//***********************************
+//****************************************
+//***********Processing Sites************
+//****************************************
 
 function Bundle_ProcessKeys()
 {
-    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join() /* + '&auto=1'*/); //you may uncomment 'auto' parameter to start redeeming the keys immediately
+    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join() + (AutoActivate ? '&auto=1' : ''));
 
     try
     {
@@ -369,12 +379,33 @@ function Bundle_ProcessKeys()
     }
 }
 
+//*************Group Bundles*************
+function GroupBundlesProcess()
+{
+    if($('.reservation-lbl').length)
+    {
+        $('.reservation-lbl').after('<br><div id="RegisterKeysGB" class="ui button blue compact"><span>Register ' + ($('table').length ? 'All the Keys' : 'the Key') + ' on Steam</span></div>');
+    }
+
+    $('#RegisterKeysGB').click(function(){
+        if($('table').length)
+        {
+            KeysData = $('table td').text().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+        }
+        else
+        {
+            KeysData.push($('p').eq(0).text());
+        }
+        Bundle_ProcessKeys();
+    });
+}
+
 //************IndieGala**************
 var IG_Codes = [];
 
 function IndieGalaProcess()
 {
-    $('#steam-account').append('<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register all the bundle keys on Steam</a>');
+    $('#steam-account').append('<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register All the Bundle Keys on Steam</a>');
 
     $('#RegisterKeysIndieGala').click(function(){
 
