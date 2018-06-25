@@ -2,11 +2,12 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.2.0
+// @version      2.3.0
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
 // @match        https://www.indiegala.com/profile?user_id=*
+// @match        https://www.indiegala.com/gift?gift_id=*
 // @match        https://www.gogobundle.com/latest/bundles/order/show/cid-*
 // @match        https://www.gogobundle.com/account/order/show/cid-*
 // @match        https://otakubundle.com/latest/bundles/order/show/cid-*
@@ -382,21 +383,59 @@ function Bundle_ProcessKeys()
 //*************Group Bundles*************
 function GroupBundlesProcess()
 {
-    if($('.reservation-lbl').length)
+    var isIG = false;
+
+    if($('.reservation-lbl').text() != 'reservation')
     {
-        $('.reservation-lbl').after('<br><div id="RegisterKeysGB" class="ui button blue compact"><span>Register ' + ($('table').length ? 'All the Keys' : 'the Key') + ' on Steam</span></div>');
+        var ActivateWhatText = '';
+
+        if($('table').length)
+            ActivateWhatText = 'Register All the Keys on Steam';
+        else
+        {
+            if($('p').eq(0).text().match(/indiegala.com/gi))
+            {
+                ActivateWhatText = 'Unlock Gift on IndieGala';
+                isIG = true;
+            }
+            else
+            {
+                ActivateWhatText = 'Register the Key on Steam';
+            }
+        }
+
+        $('.reservation-lbl').after('<br><div id="RegisterKeysGB" class="ui button blue compact"><span>' + ActivateWhatText + '</span></div>');
     }
 
     $('#RegisterKeysGB').click(function(){
-        if($('table').length)
+        if(isIG)
         {
-            KeysData = $('table td').text().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+            var ig_link = $('p').eq(0).text().replace(' | ', '&p=');
+
+            var wnd = window.open(ig_link.match(/https?:\/\//) ? ig_link : 'https://' + ig_link);
+
+            try
+            {
+                wnd.focus();
+            }
+            catch(e)
+            {
+                alert("Pop-up Blocker is enabled! The script won't be able to redirect you to IndieGala until you have the Pop-up blocker enabled for this site!");
+            }
         }
         else
         {
-            KeysData.push($('p').eq(0).text());
+            if($('table').length)
+            {
+                KeysData = $('table td').text().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+            }
+            else
+            {
+                KeysData.push($('p').eq(0).text());
+            }
+
+            Bundle_ProcessKeys();
         }
-        Bundle_ProcessKeys();
     });
 }
 
@@ -405,35 +444,121 @@ var IG_Codes = [];
 
 function IndieGalaProcess()
 {
-    $('#steam-account').append('<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register All the Bundle Keys on Steam</a>');
+    if(location.href.toLowerCase().includes('indiegala.com/gift'))
+    {
+        IndieGalaGiftProcess();
+    }
+    else
+    {
+        $('#steam-account').append('<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register All the Bundle Keys on Steam</a>');
+        $('#RegisterKeysIndieGala').click(function(){
 
-    $('#RegisterKeysIndieGala').click(function(){
+            $('#RegisterKeysIndieGala').contents().last().replaceWith(' Processing...');
 
-        $('#RegisterKeysIndieGala').contents().last().replaceWith(' Processing...');
+            //Make sure that we're getting codes from an opened bundle
+            var fetchlinks = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=fetchlink_]');
+            for(var i = 0; i < fetchlinks.length; i++)
+            {
+                IG_Codes.push(fetchlinks.eq(i).attr('id').split('_')[1]);
+            }
 
-        //Make sure that we're getting codes from an opened bundle
-        var fetchlinks = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=fetchlink_]');
-        for(var i = 0; i < fetchlinks.length; i++)
+            var serials = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=serial_]');
+            for(i = 0; i < serials.length; i++)
+            {
+                IG_Codes.push(serials.eq(i).attr('id').split('_')[1]);
+            }
+
+            if(IG_Codes.length > 0)
+            {
+                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', ConsoleCSS);
+                IndieGalaFetchKey(0);
+            }
+            else
+            {
+                $('#RegisterKeysIndieGala').contents().last().replaceWith(' Register All the Bundle Keys on Steam');
+                alert('No keys found! It seems you don\'t have any bundle opened!');
+            }
+        });
+    }
+}
+
+function IndieGalaGiftProcess()
+{
+    var href = location.href;
+    if(href.match(/&p=./))
+    {
+        var gift_password = href.split('p=')[1];
+
+        //took some pieces from indiegala default scripts
+        var data_to_send = {};
+		data_to_send.gift_id = $( '#gift-validation-id' ).val();
+		data_to_send.gift_token = $( '#gift-validation-token' ).val();
+		data_to_send.gift_password = gift_password;
+
+        $.ajax(
         {
-            IG_Codes.push(fetchlinks.eq(i).attr('id').split('_')[1]);
-        }
+			type: 'POST',
+			url: '/gift/verify',
+			data: JSON.stringify( data_to_send ),
+			dataType: 'json',
+			success: function(response_data){
+				if ( response_data.status == 200 )
+                {
+					$('#gift-contents').append(response_data.contents)
+					$( '.gift-contents-password-cont' ).slideUp(function(){ $('#gift-contents').slideDown() });
 
-        var serials = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=serial_]');
-        for(i = 0; i < serials.length; i++)
-        {
-            IG_Codes.push(serials.eq(i).attr('id').split('_')[1]);
-        }
+                    $('#steam-key-games').after('<button id="RegisterKeysIndieGala" href="javascript://" class="icon-string order-button-profile" style="width:300px"><div class="fa fa-steam-square" style="margin-right:10px"></div><span> Register All the Bundle Keys on Steam</span></button>');
 
-        if(IG_Codes.length > 0)
-        {
-            console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', ConsoleCSS);
-            IndieGalaFetchKey(0);
-        }
-        else
-        {
-            alert('No keys found! It seems you don\'t have any bundle opened!');
-        }
-    });
+                    $('#RegisterKeysIndieGala').click(function(){
+                        $('#RegisterKeysIndieGala span').text(' Processing...');
+
+                        var fetchlinks = $('[id*=fetching_]');
+                        for(var i = 0; i < fetchlinks.length; i++)
+                        {
+                            IG_Codes.push(fetchlinks.eq(i).attr('id').split('_')[1]);
+                        }
+
+                        var serials = $('[id*=serial_n_]');
+                        for(i = 0; i < serials.length; i++)
+                        {
+                            KeysData.push(serials.eq(i).val());
+                        }
+
+                        if(IG_Codes.length > 0 || KeysData.length > 0)
+                        {
+                            if(IG_Codes.length == 0)
+                            {
+                                $('#RegisterKeysIndieGala span').text(' Done! Redirecting to Steam...');
+                                Bundle_ProcessKeys();
+                            }
+                            else
+                            {
+                                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', ConsoleCSS);
+                                IndieGalaFetchKey(0);
+                            }
+                        }
+                        else
+                        {
+                            $('#RegisterKeysIndieGala span').text(' Register All the Bundle Keys on Steam');
+                            alert('No keys found! Something went wrong!');
+                        }
+                    });
+                }
+                else
+                {
+                    handleValidationMessage(response_data.status);
+                }
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				handleValidationMessage('');
+			},
+			complete: function(){
+				$this.removeClass('disabled');
+			},
+		});
+
+    }
+
 }
 
 function IndieGalaFetchKey(i)
