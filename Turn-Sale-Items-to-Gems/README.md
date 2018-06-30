@@ -4,3 +4,5 @@
 * Copypaste script.js content into open console
 * Hit **ENTER**
 * Watch for the results
+
+p.s. Maybe I'll make a userscript version of that in the future, but I'm so busy ;<
