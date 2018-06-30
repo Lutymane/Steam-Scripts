@@ -68,7 +68,6 @@ var CheckRequests     = 0;
 function GrindItemsIntoGems(start_index)
 {
     for(var i = start_index; i < Math.min(start_index + 150, AssetIDs.length); i++)
-    //AssetIDs.forEach(function(AssetID)
     {
         var index = i;
 
@@ -110,5 +109,8 @@ function GrindItemsIntoGems(start_index)
     }
     //);
 
-    setTimeout(function(){ GrindItemsIntoGems(start_index + 150); }, 5000);
+    if(start_index + 150 < AssetIDs.length)
+    {
+        setTimeout(function(){ GrindItemsIntoGems(start_index + 150); }, 5000);
+    }
 }
