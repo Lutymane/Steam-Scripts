@@ -1,5 +1,6 @@
 //Author: Lite_OnE
-//Copyright: XEOX INC.
+//2018 Copyright: XEOX INC.
+//Many thanks to MrSteakPotato and Dacer for testing <3
 
 
 var SaleItemClassIDs =
@@ -45,9 +46,12 @@ function FetchAssetIDs(start)
             else
             {
                 Modal.Dismiss();
-                JoinAssetIDs();
+
+                Object.values(ItemsContainer).forEach(function(Arr){AssetIDs = AssetIDs.concat(Arr);});
+
                 Modal = ShowConfirmDialog('Warning', 'Found <span style="color:#b698cc;">%c</span> items!<br>'.replace('%c', AssetIDs.length) + (AssetIDs.length ? '<span style="color:#ff7b7b;">Are you sure you want to turn them into gems?</span>' : '')).done(function()
                 {
+                    Start_Time = (new Date()).getTime();
                     GrindItemsIntoGems(0);
                 });
             }
@@ -56,61 +60,79 @@ function FetchAssetIDs(start)
     });
 }
 
-function JoinAssetIDs()
-{
-    Object.values(ItemsContainer).forEach(function(Arr){AssetIDs = AssetIDs.concat(Arr);});
-}
-
 var TotalGemsRecieved = 0;
 var TotalGems         = 0;
 var CheckRequests     = 0;
+var bLimitExceeded    = false;
+var LimitExceededMessage = '<br><span style="color:#D42F2F;">Limit exceeded! We will wait 30 seconds before processing the next batch...</span>';
+
+//28 seconds for 100 items
+var dTimeout          = 1400;
+var dIndex            = 5;
+
+var Start_Time        = 0;
+var Finish_Time       = 0;
 
 function GrindItemsIntoGems(start_index)
 {
-    for(var i = start_index; i < Math.min(start_index + 150, AssetIDs.length); i++)
+    setTimeout(function()
     {
-        var index = i;
-
-        var FormData = 
+        bLimitExceeded = false;
+        
+        for(var i = start_index; i < Math.min(start_index + dIndex, AssetIDs.length); i++)
         {
-            sessionid: g_sessionID,
-            appid: 876740,
-            assetid: AssetIDs[index],
-            contextid: 6,
-            goo_value_expected: 100
+            var index = i;
+
+            var FormData = 
+            {
+                sessionid: g_sessionID,
+                appid: 876740,
+                assetid: AssetIDs[index],
+                contextid: 6,
+                goo_value_expected: 100
+            }
+
+            //Modal.Dismiss();
+            //Modal = ShowBlockingWaitDialog( 'Processing', 'Processing ' + AssetIDs.length + ' items...' + (bLimitExceeded ? LimitExceededMessage : ''));
+
+            $J.post(g_strProfileURL + '/ajaxgrindintogoo/', FormData).done(function(data)
+            {
+                if(data.success == 1)
+                {
+                    CheckRequests++;
+
+                    Modal.Dismiss();
+                    Modal = ShowBlockingWaitDialog( 'Processing', CheckRequests + '\\' + AssetIDs.length + ' have been turned into gems' + (bLimitExceeded ? LimitExceededMessage : ''));
+
+                    TotalGemsRecieved += parseInt(data["goo_value_received "]);
+
+                    if(CheckRequests == AssetIDs.length)
+                    {
+                        Finish_Time = (new Date()).getTime();
+                        var dTime = (Finish_Time - Start_Time) / 1000; //get seconds
+                        console.log('dTime = ' + dTime);
+                        
+                        TotalGems = data.goo_value_total;
+                        Modal.Dismiss();
+                        Modal = ShowAlertDialog( 'Done!', 'Gems Received for breaking items: <span style="color:green;">' + TotalGemsRecieved + '</span><br>Total Gems Count: <span style="color:#e698cc;">' + TotalGems + '</span>');
+                        return;
+                    }
+                }
+                else
+                {
+                    console.log(data);
+                }
+            }).fail(function(data)
+            {
+                bLimitExceeded = true;
+                console.log(data);
+                //500 | {"success":16,"message":"There was an error communicating with the network. Please try again later."}
+            });
         }
 
-        Modal.Dismiss();
-        Modal = ShowAlertDialog( 'Processing', 'Processing ' + AssetIDs.length + ' items...');
-        
-        $J.post(g_strProfileURL + '/ajaxgrindintogoo/', FormData).done(function(data)
+        if(start_index + dIndex < AssetIDs.length)
         {
-            if(data.success == 1)
-            {
-                CheckRequests++;
-
-                Modal.Dismiss();
-                Modal = ShowAlertDialog( 'Processing', CheckRequests + '\\' + AssetIDs.length + ' have been turned into gems');
-                
-                TotalGemsRecieved += parseInt(data["goo_value_received "]);
-                
-                if(CheckRequests == AssetIDs.length)
-                {
-                    TotalGems = data.goo_value_total;
-                    Modal.Dismiss();
-                    Modal = ShowAlertDialog( 'Done!', 'Gems Received for breaking items: <span style="color:green;">' + TotalGemsRecieved + '</span><br>Total Gems Count: <span style="color:#e698cc;">' + TotalGems + '</span>');
-                    return;
-                }
-            }
-        }).fail(function(data)
-        {
-            
-        });
-    }
-    //);
-
-    if(start_index + 150 < AssetIDs.length)
-    {
-        setTimeout(function(){ GrindItemsIntoGems(start_index + 150); }, 5000);
-    }
+            setTimeout(function(){ GrindItemsIntoGems(start_index + dIndex); }, dTimeout);
+        }
+    }, (bLimitExceeded ? 30000 : 0));
 }
