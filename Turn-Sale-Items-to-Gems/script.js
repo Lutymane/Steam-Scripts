@@ -1,5 +1,6 @@
 //Author: Lite_OnE
-//2018 Copyright: XEOX INC.
+//Version: 1.1
+//Copyright: XEOX INC.
 //Many thanks to MrSteakPotato and Dacer for testing <3
 
 
@@ -40,7 +41,7 @@ function FetchAssetIDs(start)
             if(data.more == true)
             {
                 Modal.Dismiss();
-                Modal = ShowBlockingWaitDialog( 'Info', 'Getting inventory items info. Batch ' + ((start + 2000)/2000 + 1) + '...' );
+                Modal = ShowBlockingWaitDialog( 'Info', 'Getting inventory items info. Batch ' + ((start)/2000 + 2) + '...' );
                 FetchAssetIDs(start + 2000);
             }
             else
@@ -63,11 +64,12 @@ function FetchAssetIDs(start)
 var TotalGemsRecieved = 0;
 var TotalGems         = 0;
 var CheckRequests     = 0;
+var FailedRequests    = 0;
 var bLimitExceeded    = false;
 var LimitExceededMessage = '<br><span style="color:#D42F2F;">Limit exceeded! We will wait 30 seconds before processing the next batch...</span>';
 
 //28 seconds for 100 items
-var dTimeout          = 1400;
+var dTimeout          = 1450;
 var dIndex            = 5;
 
 var Start_Time        = 0;
@@ -106,7 +108,7 @@ function GrindItemsIntoGems(start_index)
 
                     TotalGemsRecieved += parseInt(data["goo_value_received "]);
 
-                    if(CheckRequests == AssetIDs.length)
+                    if((CheckRequests + FailedRequests) == AssetIDs.length)
                     {
                         Finish_Time = (new Date()).getTime();
                         var dTime = (Finish_Time - Start_Time) / 1000; //get seconds
@@ -124,9 +126,10 @@ function GrindItemsIntoGems(start_index)
                 }
             }).fail(function(data)
             {
+                FailedRequests++;
                 bLimitExceeded = true;
                 console.log(data);
-                //500 | {"success":16,"message":"There was an error communicating with the network. Please try again later."}
+                //500 | {"success":16,"message":"There was an error communicating with the network. Please try again later."}                
             });
         }
 
