@@ -1,5 +1,5 @@
 //Author: Lite_OnE
-//Version: 1.1
+//Version: 1.2
 //Copyright: XEOX INC.
 //Many thanks to MrSteakPotato and Dacer for testing <3
 
@@ -68,8 +68,8 @@ var FailedRequests    = 0;
 var bLimitExceeded    = false;
 var LimitExceededMessage = '<br><span style="color:#D42F2F;">Limit exceeded! We will wait 30 seconds before processing the next batch...</span>';
 
-//28 seconds for 100 items
-var dTimeout          = 1450;
+//`dIndex` items per `dTimeout` milliseconds
+var dTimeout          = 1500;
 var dIndex            = 5;
 
 var Start_Time        = 0;
@@ -135,7 +135,7 @@ function GrindItemsIntoGems(start_index)
 
         if(start_index + dIndex < AssetIDs.length)
         {
-            setTimeout(function(){ GrindItemsIntoGems(start_index + dIndex); }, dTimeout);
+            setTimeout(function(){ GrindItemsIntoGems(start_index + dIndex); }, (dTimeout + Math.trunc(FailedRequests/10)*100));
         }
     }, (bLimitExceeded ? 30000 : 0));
 }
