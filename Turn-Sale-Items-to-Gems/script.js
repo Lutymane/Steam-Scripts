@@ -1,5 +1,5 @@
 //Author: Lite_OnE
-//Version: 1.2
+//Version: 1.3
 //Copyright: XEOX INC.
 //Many thanks to MrSteakPotato and Dacer for testing <3
 
@@ -79,6 +79,12 @@ function GrindItemsIntoGems(start_index)
 {
     setTimeout(function()
     {
+        if(FailedRequests > 70)
+        {
+            alert('>70 requests failed. Script is blocked.');
+            return;
+        }
+        
         bLimitExceeded = false;
         
         for(var i = start_index; i < Math.min(start_index + dIndex, AssetIDs.length); i++)
