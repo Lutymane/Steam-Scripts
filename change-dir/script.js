@@ -5,7 +5,7 @@
 // @description  test
 // @author       Lite_OnE
 // @match        https://steamcommunity.com/id/lite_one/
-// @downloadURL  
+// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/blob/test/change-dir/script.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 alert(1);
