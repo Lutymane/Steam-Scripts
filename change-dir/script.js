@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         change-dir-test
 // @namespace    top_xex
-// @version      1.1
+// @version      1.2
 // @description  test
 // @author       Lite_OnE
 // @match        https://steamcommunity.com/id/lite_one/
