@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.4.0
+// @version      2.4.1
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -474,7 +474,7 @@ $(document).ready(function()
             parse_method = window.localStorage.getItem('parse_method');
             log_level    = window.localStorage.getItem('log_level');
             output_opt   = window.localStorage.getItem('output_opt');
-            timestamp    = window.localStorage.getItem('timestamp') || 0;
+            timestamp    = parseInt(window.localStorage.getItem('timestamp')) || 0;
 
             if(!parse_method || !log_level || !output_opt)
             {
