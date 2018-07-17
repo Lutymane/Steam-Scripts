@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.3.1
+// @version      2.4.0
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -24,19 +24,31 @@ var Unprocessed_Keys      = [];
 var OtherFailed_Keys      = [];
 var bLimitExceeded        = false;
 var KeysAmount            = 0;
+var KeysActivatedSuc      = 0;
+var KeysFailed            = 0;
 var KeysTextarea          = null;
 var LogDisplay            = null;
+//Settings
+var SettingsModal         = '<div id="ModalBlock" style="display: none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><select id="parse_method" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;"><option value="rgx">Regex</option><option value="def">Default</option></select>License Keys Parsing Method</div><div><select id="log_level" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;"><option value="ext">Extended</option><option value="short">Short</option></select>Logging Level</div><div><select id="output_opt" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;"><option value="trad">Trading</option><option value="min">BKA/ASF Ready</option></select>Unused Keys Output Option</div></div></div></div></div></div>';
+var parse_method          = '';
+var log_level             = '';
+var output_opt            = '';
+var timestamp             = 0;
 //Collect Keys from bundle sites here
 var KeysData              = [];
 //Fancy Console
 var ConsoleCSS            = 'color:#FFE4E1; font-size: 15px; font-family: raleway; background-color: #F14D39';
 //**********************************************
-//You can change it to true for auto activating. Keep in mind, that if you use this, you automatically agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
+//You can change it to true for auto activating.
+//Keep in mind, that if you use this, you automatically agree to
+//the terms of the SSA https://store.steampowered.com/checkout/ssapopup
 var AutoActivate          = false;
 //**********************************************
 
 function RegisterFailure(ePurchaseResult, receipt, key)
 {
+    KeysFailed++;
+    
     var sErrorMessage = '';
 
     switch (ePurchaseResult)
@@ -92,14 +104,51 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             bLimitExceeded = true;
             break;
         case 9:
-            AlreadyOwnedGame_Keys.push(key);
+            try
+            {
+                AlreadyOwnedGame_Keys.push(
+                    {
+                        name: receipt.line_items[0].line_item_description,
+                        key: key
+                    });
+            }
+            catch
+            {
+                AlreadyOwnedGame_Keys.push(
+                    {
+                        name: '[error] (name undefined)',
+                        key: key
+                    });
+            }
             break;
         default:
-            OtherFailed_Keys.push(key);
+            try
+            {
+                OtherFailed_Keys.push(
+                    {
+                        name: receipt.line_items[0].line_item_description,
+                        key: key
+                    });
+            }
+            catch
+            {
+                OtherFailed_Keys.push(
+                    {
+                        name: '[error] (possibly invalid key)',
+                        key: key
+                    });
+            }
             break;
     }
 
-    LogDisplay.append('<br><br><hr><br>' + key + "<br><br>Failed! " + sErrorMessage);
+    if(log_level == 'short')
+    {
+        LogDisplay.append('<br>' + key + " | Failed! <br>");
+    }
+    else
+    {
+        LogDisplay.append('<br>' + key + "<br><br>Failed! " + sErrorMessage + '<br><br><hr>');
+    }
 }
 
 function ActivateKey(i)
@@ -114,7 +163,16 @@ function ActivateKey(i)
         {
             if (Result.success == 1)
             {
-                LogDisplay.append('<br><br><hr><br>' + Keys[i] + '<br><br>Success! Product: "' + Result.purchase_receipt_info.line_items[0].line_item_description + '" has been added to your account.');
+                KeysActivatedSuc++;
+                
+                if(log_level == 'short')
+                {
+                    LogDisplay.append('<br>' + Keys[i] + '| Success!<br>');    
+                }
+                else
+                {
+                    LogDisplay.append('<br>' + Keys[i] + '<br><br>Success! Product: "' + (Result.purchase_receipt_info.line_items.length ? Result.purchase_receipt_info.line_items[0].line_item_description : '[error] (undefined name)') + '" has been added to your account.<br><br><hr>');
+                }
             }
             else if (Result.purchase_result_details !== undefined && Result.purchase_receipt_info !== undefined)
             {
@@ -129,8 +187,13 @@ function ActivateKey(i)
                 scrollTop: LogDisplay[0].scrollHeight
             }, 1000);
 
-            if(bLimitExceeded)
+            if(bLimitExceeded || KeysActivatedSuc == 50 || KeysFailed == 10 /*|| (KeysActivatedSuc + KeysFailed == 40)*/)
             {
+                timestamp = (new Date).getTime() + 3600000;//+ 1 hour
+                window.localStorage.setItem('timestamp', timestamp);
+                
+                bLimitExceeded = true;
+                
                 for(var j = i; j < KeysAmount; j++)
                 {
                     Unprocessed_Keys.push(Keys[j]);
@@ -159,10 +222,28 @@ function ActivateKey(i)
     });
 }
 
+function PrintKeys(arr)
+{
+    if(output_opt == 'min')
+    {
+        for(var i = 0; i < arr.length; i++)
+        {
+            LogDisplay.append(arr[i].key + (i+1 < arr.length ? ',' : ''));
+        }
+    }
+    else
+    {
+        for(var i = 0; i < arr.length; i++)
+        {
+            LogDisplay.append(arr[i].name + ': ' + arr[i].key + '<br>');
+        }
+    }
+}
+
 function OnActivationProcessFinished()
 {
-    LogDisplay.append('<br><br><hr><br>');
-//yellow (253,215,51)
+    LogDisplay.append('<br>');
+
     if(Unprocessed_Keys.length == 0)
     {
         if((AlreadyOwnedGame_Keys.length != 0) || (OtherFailed_Keys.length != 0))
@@ -172,12 +253,14 @@ function OnActivationProcessFinished()
 
             if(AlreadyOwnedGame_Keys.length != 0)
             {
-                LogDisplay.append('<br><br>Already Owned Game Keys:<br>' + AlreadyOwnedGame_Keys.join());
+                LogDisplay.append('<br><br>Already Owned Game Keys:<br>');
+                PrintKeys(AlreadyOwnedGame_Keys);
             }
 
             if(OtherFailed_Keys.length != 0)
             {
-                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>' + OtherFailed_Keys.join());
+                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>');
+                PrintKeys(OtherFailed_Keys);
             }
         }
         else
@@ -188,25 +271,29 @@ function OnActivationProcessFinished()
     }
     else
     {
+        var date = new Date(timestamp);
+        
         if((AlreadyOwnedGame_Keys.length != 0) || (OtherFailed_Keys.length != 0))
         {
             LogDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
-            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Also some of the keys have failed to be activated:');
+            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at ' + date.getHours() + ':' + date.getMinutes() + '. Also some of the keys have failed to be activated:');
 
             if(AlreadyOwnedGame_Keys.length != 0)
             {
-                LogDisplay.append('<br><br>Already Owned Game Keys:<br>' + AlreadyOwnedGame_Keys.join());
+                LogDisplay.append('<br><br>Already Owned Game Keys:<br>');
+                PrintKeys(AlreadyOwnedGame_Keys);
             }
 
             if(OtherFailed_Keys.length != 0)
             {
-                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>' + OtherFailed_Keys.join());
+                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>');
+                PrintKeys(OtherFailed_Keys);
             }
         }
         else
         {
             LogDisplay.css('background-color', 'rgba(255,174,25, 0.3)');//orange
-            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated:');
+            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at '  + date.getHours() + ':' + date.getMinutes());
         }
 
         LogDisplay.append('<br><br>Unprocessed keys:<br>' + Unprocessed_Keys.join());
@@ -237,9 +324,28 @@ function DeserializeKeys(Source)
 function InitializeKeysRegistration()
 {
     LogDisplay.css('display', 'inherit');
+    LogDisplay.text('');
+    
+    if((new Date).getTime() < timestamp)
+    {
+        var date = new Date(timestamp);
+        LogDisplay.append('Keys Activation Cooldown has not passed yet!<br>Try to activate again at ' + date.getHours() + ':' + date.getMinutes());
+        return;
+    }
+    
     if (KeysTextarea.val() != "" && $('#accept_ssa').is(':checked'))
     {
-        switch($('#method :selected').val())
+        if(parse_method == 'def')
+        {
+            Keys = DeserializeKeys(KeysTextarea.val().split('\n'));
+        }
+        else
+        {
+            Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+        }
+       
+        /*
+        switch(parse_method)
         {
             case 'rgx':
                 Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
@@ -248,11 +354,13 @@ function InitializeKeysRegistration()
                 Keys = DeserializeKeys(KeysTextarea.val().split('\n'));
                 break;
             default:
+                alert('Invalid keys parsing method!');
                 return;
         }
+        */
 
         KeysAmount = Keys.length;
-        LogDisplay.text('Processing given keys...');
+        LogDisplay.append('Processing given keys...<br><br><hr>');
 
         AlreadyOwnedGame_Keys = [];
         Unprocessed_Keys      = [];
@@ -269,6 +377,28 @@ function InitializeKeysRegistration()
     {
         LogDisplay.text('You must input at least one key!');
     }
+}
+
+function OpenSettings()
+{
+    $('#ModalBlock').css('display', 'block');
+
+    $('#parse_method').val(window.localStorage.getItem('parse_method'));
+    $('#log_level').val(window.localStorage.getItem('log_level'));
+    $('#output_opt').val(window.localStorage.getItem('output_opt'));
+}
+
+function SaveSettings()
+{
+    parse_method = $('#parse_method :selected').val();
+    log_level    = $('#log_level :selected').val();
+    output_opt   = $('#output_opt :selected').val();
+
+    window.localStorage.setItem('parse_method', parse_method);
+    window.localStorage.setItem('log_level', log_level);
+    window.localStorage.setItem('output_opt', output_opt);
+
+    $('#ModalBlock').css('display', 'none');
 }
 
 $(document).ready(function()
@@ -330,14 +460,30 @@ $(document).ready(function()
             KeysTextarea.css('padding', 0);
 
             KeysTextarea.css('max-height', '300px');
-            KeysTextarea.css('min-height', '57px');
+            KeysTextarea.css('min-height', '60px');
             KeysTextarea.css('height', 'auto');
             KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 10 + 'px');
 
             $('#register_btn').removeAttr('href');
+            $('#register_btn').attr('style', 'width:104px;text-align:center;');
             $('#register_btn').click(function(){InitializeKeysRegistration();});
+            $('#register_btn').after('<a class="btnv6_blue_hoverfade btn_medium" id="settings_btn" style="margin-top:5px;width:104px;text-align:center;"><span>Settings</span></a>');
 
-            $('#register_btn').after('<select name="method" id="method" class="gray_bevel dynInput" style="width:95px;height:32px;margin-left: 12px;"><option value="rgx">Regex</option><option value="def">Default</option></select>');
+            $('.responsive_page_frame.with_header').after(SettingsModal);
+
+            parse_method = window.localStorage.getItem('parse_method');
+            log_level    = window.localStorage.getItem('log_level');
+            output_opt   = window.localStorage.getItem('output_opt');
+            timestamp    = window.localStorage.getItem('timestamp') || 0;
+
+            if(!parse_method || !log_level || !output_opt)
+            {
+                alert('Warning! The script has been updated and it wasn\'t able to find settings values. Please review your current preferences, otherwise default set up will be used');
+                $('#ModalBlock').css('display', 'block');
+            }
+
+            $('#settings_btn').click(function(){OpenSettings();});
+            $('.newmodal_close').click(function(){SaveSettings();$('#ModalBlock').css('display', 'none');});
 
             LogDisplay = $('#error_display');
             LogDisplay.css('max-height', '400px');
