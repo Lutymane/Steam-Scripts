@@ -1,4 +1,4 @@
 // ==UserScript==
 // @name         change-dir-test
-// @version      2.1
+// @version      2.2
 // ==/UserScript==
