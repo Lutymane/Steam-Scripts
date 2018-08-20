@@ -15,6 +15,8 @@
 // @match        https://www.fanatical.com/*/orders/*
 // @match        https://www.humblebundle.com/downloads?key=*
 // @match        https://groupbundl.es/buy/*
+// @homepageURL  https://xeox.xyz
+// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
 // @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.meta.js
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.user.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
