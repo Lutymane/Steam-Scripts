@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.4.1
+// @version      2.4.2
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -15,6 +15,7 @@
 // @match        https://www.fanatical.com/*/orders/*
 // @match        https://www.humblebundle.com/downloads?key=*
 // @match        https://groupbundl.es/buy/*
+// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.meta.js
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.user.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
