@@ -1,3 +1,5 @@
+#Turn Steam sale items into gems
+
 # WARNING! The script may cause a heavy load on Steam servers, so use it carefully!
 
 ## Guide:
