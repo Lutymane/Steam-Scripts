@@ -1,13 +1,13 @@
 //Author: Lite_OnE
-//Version: 1.3
+//Version: 1.4
 //Copyright: XEOX INC.
-//Many thanks to MrSteakPotato and Dacer for testing <3
+//Many thanks to MrSteakPotato and DACER for testing <3
 
 
 var SaleItemClassIDs =
 [
-    /*bgs*/ 2879031771, 2879031996, 2879031971, 2879031820, 2879031722, 2879031839, 2879032887,
-    /*emots*/ 2879031821, 2879031723, 2879031772, 2879032888, 2879032149, 2879032046, 2879032116
+    /*bgs*/ 3120030341, 3120030674, 3120031194, 3120030634, 3120030516, 3120030287, 3120031089, 3120030283,
+    /*emots*/ 3120030294, 3120030293, 3120030284, 3120030299, 3120030505, 3120030636, 3120030517, 3120030638
 ];
 
 var ItemsContainer = {};
@@ -94,7 +94,7 @@ function GrindItemsIntoGems(start_index)
             var FormData = 
             {
                 sessionid: g_sessionID,
-                appid: 876740,
+                appid: 991980,
                 assetid: AssetIDs[index],
                 contextid: 6,
                 goo_value_expected: 100
