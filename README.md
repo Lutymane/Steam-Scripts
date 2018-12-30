@@ -2,6 +2,7 @@
 Use Tampermonkey/Greasemonkey or similar userscript manager
 
 ### Direct Install Links:
+* [Consume Knick-Knacks [1.0]](https://github.com/LiteOnE/Steam-Scripts/blob/master/Consume-Knick-Knacks/Consume-Knick-Knacks.user.js)
 
 * [Batch Keys Activator [2.4]](https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.user.js)
 
