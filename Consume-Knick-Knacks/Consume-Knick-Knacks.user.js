@@ -124,6 +124,9 @@ function ConsumeAssetID(i = 0)
                         location.href = 'https://steamcommunity.com/id/lite_one';
                     }
                 );
+
+                activated = 0;
+                errored = 0;
             }
         }
     );
@@ -179,6 +182,8 @@ function FetchAssetIDs(start = 0)
         {
             console.log(assetIDsToConsume);
             
+            batch = 0;
+
             let modal_input = null;
             
             modal.Dismiss();
@@ -226,5 +231,5 @@ function FetchAssetIDs(start = 0)
 $J(function()
 {
     $J('.inventory_rightnav').prepend(btn_html);
-    $J(`#${btn_id_selector}`).click(FetchAssetIDs);
+    $J(`#${btn_id_selector}`).click(() => FetchAssetIDs());
 });
