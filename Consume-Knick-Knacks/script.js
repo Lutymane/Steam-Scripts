@@ -11,7 +11,7 @@ var classIDsBlackList = [
 var classIDsToConsume = [];
 var assetIDsToConsume = [];
 
-var timeout = 500;//ms
+var timeout = 250;//ms
 
 var modal = null;
 
