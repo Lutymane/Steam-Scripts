@@ -90,7 +90,7 @@ function ConsumeAssetID(i = 0)
         {
             modal.Dismiss();
             modal = ShowBlockingWaitDialog( 'Consuming', '<div style="display: inline-block;margin-left: 20px;">' +
-                    `<span style="color: lightseagreen;">Consuming Knick-Knacks: ${errored + activated}/${assetIDsToConsume.length}</span>`
+                    `<span style="color: lightseagreen;">Consuming Knick-Knacks: ${errored + activated}/${limit}</span>`
                     + (errored ? `<br><span style="color:#b698cc;">Failed: ${errored}</span>` : '') + '</div>' );
 
             if(activated + errored == limit)
@@ -178,6 +178,12 @@ function FetchAssetIDs(start = 0)
                     if(limit > 0)
                     {
                         startTime = (new Date()).getTime();
+
+                        modal.Dismiss();
+                        modal = ShowBlockingWaitDialog( 'Consuming', '<div style="display: inline-block;margin-left: 20px;">' +
+                                `<span style="color: lightseagreen;">Consuming Knick-Knacks: ${errored + activated}/${limit}</span>`
+                                + (errored ? `<br><span style="color:#b698cc;">Failed: ${errored}</span>` : '') + '</div>' );
+
                         ConsumeAssetID();
                     }
                 }
