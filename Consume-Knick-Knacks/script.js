@@ -15,6 +15,8 @@ const timeout = 500;//ms
 
 var modal     = null;
 
+var limit = 0;
+
 var activated = 0;
 var errored   = 0;
 
@@ -74,9 +76,6 @@ function ConsumeAssetID(i = 0)
                 modal.Dismiss();
 
                 activated += 1;
-                modal = ShowBlockingWaitDialog( 'Consuming', '<div style="display: inline-block;margin-left: 20px;">' +
-                    `<span style="color: lightseagreen;">Consuming Knick-Knacks: ${t}/${assetIDsToConsume.length}</span>`
-                    + (errored ? `<br><span style="color:#b698cc;">Failed: ${errored}</span>` : '') + '</div>' );
             }
             else
             {
@@ -85,7 +84,9 @@ function ConsumeAssetID(i = 0)
                 errored += 1
             }
 
-
+            modal = ShowBlockingWaitDialog( 'Consuming', '<div style="display: inline-block;margin-left: 20px;">' +
+                    `<span style="color: lightseagreen;">Consuming Knick-Knacks: ${t}/${assetIDsToConsume.length}</span>`
+                    + (errored ? `<br><span style="color:#b698cc;">Failed: ${errored}</span>` : '') + '</div>' );
         }
     ).fail(
         function(data){
@@ -98,7 +99,7 @@ function ConsumeAssetID(i = 0)
 
     i += 1;
 
-    if(i < assetIDsToConsume.length)
+    if(i < limit)
     {
         setTimeout(() => {
             ConsumeAssetID(i);
@@ -157,14 +158,29 @@ function FetchAssetIDs(start = 0)
             console.log(assetIDsToConsume);
             
             modal.Dismiss();
-            modal = ShowConfirmDialog('Warning', `Found <span style="color:#b698cc;">${assetIDsToConsume.length} Knick-Knacks!</span>` + (assetIDsToConsume.length ? '<br><span style="color:lightseagreen;">Are you sure you want to consume them?</span>' : '')).done(function()
+            modal = ShowConfirmDialog('Warning', `Found <span style="color:#b698cc;">${assetIDsToConsume.length} Knick-Knacks!</span>` + 
+                '<br><br><span style="color:lightseagreen;">Limit consuming</span>' +
+                '<input type="text" id="knacks_limit" style="margin-left: 20px;"><br><br>'
+            ).done(function()
             {
-                if(assetIDsToConsume.length > 0)
+                if($J('#knacks_limit').val())
                 {
-                    startTime = (new Date()).getTime();
-                    ConsumeAssetID();
+                    limit = parseInt($J('#knacks_limit').val());
+
+                    if(limit > assetIDsToConsume.length)
+                    {
+                        limit = assetIDsToConsume.length;
+                    }
+
+                    if(limit > 0)
+                    {
+                        startTime = (new Date()).getTime();
+                        ConsumeAssetID();
+                    }
                 }
             });
+
+            $J('#knacks_limit').val(assetIDsToConsume.length);
         }
         
     }).fail(
