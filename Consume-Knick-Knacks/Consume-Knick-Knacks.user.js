@@ -73,11 +73,11 @@ function msToTimeStr(_t)
 function ConsumeAssetID(i = 0)
 {
     var rgAJAXParams = {
-		sessionid: g_sessionID,
-		appid: appID,
-		item_type: 100,
-		assetid: assetIDsToConsume[i],
-		actionparams: '{"action":"consume_winter2018"}'
+    	sessionid: g_sessionID,
+    	appid: appID,
+    	item_type: 100,
+    	assetid: assetIDsToConsume[i],
+    	actionparams: '{"action":"consume_winter2018"}'
     };
     
 	var strActionURL = g_strProfileURL + "/ajaxactivateconsumable/";
