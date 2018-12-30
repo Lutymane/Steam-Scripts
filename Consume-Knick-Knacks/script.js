@@ -6,7 +6,7 @@ const appID = 991980;
 
 //exclude non knick knacks consumables
 const classIDsBlackList = [
-    2838587436 /*mystery box "unpack_2018mystery"*/
+    "2838587436" /*mystery box "unpack_2018mystery"*/
 ];
 var classIDsToConsume = [];
 var assetIDsToConsume = [];
@@ -118,35 +118,37 @@ function ConsumeAssetID(i = 0)
 var batch = 1;
 function FetchAssetIDs(start = 0)
 {
-    modal = ShowBlockingWaitDialog( 'Info', `Processing inventory items info...` );
+    modal = ShowBlockingWaitDialog( 'Info', `Processing inventory items info. <span style="color:#b698cc;">Batch: ${batch}</span>` );
     
     $J.get("/inventory/" + g_steamID + "/753/6?count=2000&start_assetid=" + start).done(function(inventory)
     {
-        for(let d in inventory["descriptions"])
+        inventory["descriptions"].forEach(d =>
         {
-            for(let t in d["tags"])
+            d["tags"].forEach(t =>
             {
-                if(t["internal_name"] == "item_class_6" && !classIDsBlackList.includes(d["classid"]))
+                if(t["internal_name"] == "item_class_6")
                 {
-                    classIDsToConsume.push(d["classid"])
+                    if(!classIDsBlackList.includes(d["classid"]))
+                    {
+                        classIDsToConsume.push(d["classid"]);
+                    }
                 }
-            }
-        }
+            });
+        });
 
-        for(let a in inventory["assets"])
+        inventory["assets"].forEach(a =>
         {
             if(classIDsToConsume.includes(a["classid"]))
             {
                 assetIDsToConsume.push(a["assetid"]);
             }
-        }
+        });
 
         if(inventory["more_items"])
         {
             modal.Dismiss();
             
             batch += 1;
-            modal = ShowBlockingWaitDialog( 'Info', `Processing inventory items info. <span style="color:#b698cc;">Batch: ${batch}</span>` );
             
             FetchAssetIDs(inventory["last_assetid"]);
         }
@@ -157,8 +159,11 @@ function FetchAssetIDs(start = 0)
             modal.Dismiss();
             modal = ShowConfirmDialog('Warning', `Found <span style="color:#b698cc;">${assetIDsToConsume.length} Knick-Knacks!</span>` + (assetIDsToConsume.length ? '<br><span style="color:lightseagreen;">Are you sure you want to consume them?</span>' : '')).done(function()
             {
-                startTime = (new Date()).getTime();
-                ConsumeAssetID();
+                if(assetIDsToConsume.length > 0)
+                {
+                    startTime = (new Date()).getTime();
+                    ConsumeAssetID();
+                }
             });
         }
         
