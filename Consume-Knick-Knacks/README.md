@@ -6,7 +6,7 @@
 * Hit install
 * Now you will have `Consume Knick-Knacks` button
 
-## Non-userscript manager users:
+## Non userscript manager users:
 * Open: https://steamcommunity.com/my/inventory/
 * Hit F12 or whatever and open up a console tab
 * Copypaste Consume-Knick-Knacks.user.js content into open console
