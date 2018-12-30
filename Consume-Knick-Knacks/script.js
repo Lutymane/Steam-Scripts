@@ -11,7 +11,7 @@ var classIDsBlackList = [
 var classIDsToConsume = [];
 var assetIDsToConsume = [];
 
-var timeout = 250;//ms
+var timeout = 50;//ms
 
 var modal = null;
 
@@ -91,7 +91,7 @@ function ConsumeAssetID(i = 0)
             modal.Dismiss();
             modal = ShowBlockingWaitDialog( 'Consuming', '<div style="display: inline-block;margin-left: 20px;">' +
                     `<span style="color: lightseagreen;">Consuming Knick-Knacks: ${errored + activated}/${limit}</span>`
-                    + (errored ? `<br><span style="color:#b698cc;">Failed: ${errored}</span>` : '') + '</div>' );
+                    + (errored ? `<br><span style="color:#d25d67;">Failed: ${errored}</span>` : '') + '</div>' );
 
             if(activated + errored == limit)
             {
