@@ -163,6 +163,8 @@ function FetchAssetIDs(start = 0)
                 '<input type="text" id="knacks_limit" style="margin-left: 20px;"><br><br>'
             ).done(function()
             {
+                console.log("okay");
+                
                 if($J('#knacks_limit').val())
                 {
                     limit = parseInt($J('#knacks_limit').val());
