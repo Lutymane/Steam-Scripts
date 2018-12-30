@@ -2,16 +2,16 @@
 //Version: 1.0
 //Copyright: XEOX INC.
 
-const appID = 991980;
+var appID = 991980;
 
 //exclude non knick knacks consumables
-const classIDsBlackList = [
+var classIDsBlackList = [
     "2838587436" /*mystery box "unpack_2018mystery"*/
 ];
 var classIDsToConsume = [];
 var assetIDsToConsume = [];
 
-const timeout = 500;//ms
+var timeout = 500;//ms
 
 var modal     = null;
 
@@ -157,39 +157,34 @@ function FetchAssetIDs(start = 0)
         {
             console.log(assetIDsToConsume);
             
+            let modal_input = null;
+            
             modal.Dismiss();
             modal = ShowConfirmDialog('Warning', `Found <span style="color:#b698cc;">${assetIDsToConsume.length} Knick-Knacks!</span>` + 
                 '<br><br><span style="color:lightseagreen;">Limit consuming</span>' +
-                '<input type="text" id="knacks_limit" style="margin-left: 20px;"><br><br>'
+                '<input type="text" id="knacks_limit" style="margin-left: 20px;"><br><br>',
+                "Start"
             ).done(function()
             {
-                console.log("okay");
-                
-                if($J('#knacks_limit').val())
+                if(modal_input.val())//$J('#knacks_limit').val() doesn't work -- it just doesn't update the object for some reason -- needs investigation why
                 {
-                    console.log("limit is valid");
-                    
-                    limit = parseInt($J('#knacks_limit').val());
-
-                    console.log("limit parsed: " + limit);
+                    limit = parseInt(modal_input.val());
 
                     if(limit > assetIDsToConsume.length)
                     {
                         limit = assetIDsToConsume.length;
                     }
 
-                    console.log("limit: " + limit);
-
                     if(limit > 0)
                     {
                         startTime = (new Date()).getTime();
-                        console.log("start consuming");
                         ConsumeAssetID();
                     }
                 }
             });
 
-            $J('#knacks_limit').val(assetIDsToConsume.length);
+            modal_input = $J('#knacks_limit');
+            modal_input.val(assetIDsToConsume.length);
         }
         
     }).fail(
