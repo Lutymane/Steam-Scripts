@@ -3,6 +3,7 @@
 ## Userscript manager users:
 * Install Tampermonkey/Greasemonkey or similar add-on
 * Open Consume-Knick-Knacks.user.js
+* Click `Raw` button
 * Hit install
 * Now you will have `Consume Knick-Knacks` button
 
