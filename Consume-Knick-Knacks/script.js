@@ -167,6 +167,8 @@ function FetchAssetIDs(start = 0)
                 
                 if($J('#knacks_limit').val())
                 {
+                    console.log("limit is valid");
+                    
                     limit = parseInt($J('#knacks_limit').val());
 
                     console.log("limit parsed: " + limit);
