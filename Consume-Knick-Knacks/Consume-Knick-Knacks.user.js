@@ -223,7 +223,7 @@ function FetchAssetIDs(start = 0)
     );
 }
 
-$(function()
+$J(function()
 {
     $J('.inventory_rightnav').prepend(btn_html);
     $J(`#${btn_id_selector}`).click(FetchAssetIDs);
