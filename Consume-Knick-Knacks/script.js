@@ -106,7 +106,7 @@ function ConsumeAssetID(i = 0)
                 $J('.newmodal_buttons .btn_darkblue_white_innerfade.btn_medium').click(
                     function()
                     {
-                        location.href = 'https://steamcommunity.com/id/lite_one'
+                        location.href = 'https://steamcommunity.com/id/lite_one';
                     }
                 );
             }
