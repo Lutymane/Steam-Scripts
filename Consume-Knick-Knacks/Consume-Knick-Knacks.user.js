@@ -1,17 +1,31 @@
-//Author: Lite_OnE
-//Version: 1.0
-//Copyright: XEOX INC.
+// ==UserScript==
+// @name         Consume Knick Knacks
+// @icon         https://store.steampowered.com/favicon.ico
+// @namespace    top_xex
+// @version      1.0
+// @description  Choose how many Knick-Knacks you want to consume in few clicks
+// @author       Lite_OnE
+// @match        https://steamcommunity.com/*/*/inventory*
+// @match        https://steamcommunity.com/*/*/inventory/*
+// @homepageURL  https://xeox.xyz
+// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
+// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Consume-Knick-Knacks/Consume-Knick-Knacks.meta.js
+// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Consume-Knick-Knacks/Consume-Knick-Knacks.user.js
+// ==/UserScript==
 
-var appID = 991980;
+const btn_id_selector = 'consume_kk';
+const btn_html = `<div class="btn_grey_black btn_medium" id="${btn_id_selector}" style="margin-right: 12px;"><span>Consume Knick-Knacks</span></div>`;
+
+const appID = 991980;
 
 //exclude non knick knacks consumables
-var classIDsBlackList = [
+const classIDsBlackList = [
     "2838587436" /*mystery box "unpack_2018mystery"*/
 ];
 var classIDsToConsume = [];
 var assetIDsToConsume = [];
 
-var timeout = 50;//ms
+const timeout = 50;//ms
 
 var modal = null;
 
@@ -64,10 +78,11 @@ function ConsumeAssetID(i = 0)
 		item_type: 100,
 		assetid: assetIDsToConsume[i],
 		actionparams: '{"action":"consume_winter2018"}'
-	};
+    };
+    
 	var strActionURL = g_strProfileURL + "/ajaxactivateconsumable/";
 
-	$J.post( strActionURL, rgAJAXParams).done(
+	$J.post(strActionURL, rgAJAXParams).done(
         function(data){
             if(data["bActivated"])
             {
@@ -208,5 +223,8 @@ function FetchAssetIDs(start = 0)
     );
 }
 
-//starting point
-FetchAssetIDs();
+$(function()
+{
+    $J('.inventory_rightnav').prepend(btn_html);
+    $J(`#${btn_id_selector}`).click(FetchAssetIDs);
+});

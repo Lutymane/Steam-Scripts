@@ -1,10 +1,16 @@
 # Consume Knick-Knacks
 
-## Guide:
+## Userscript manager users:
+* Install Tampermonkey/Greasemonkey or similar add-on
+* Open Consume-Knick-Knacks.user.js
+* Hit install
+* Now you will have `Consume Knick-Knacks` button
+
+## Non-userscript manager users:
 * Open: https://steamcommunity.com/my/inventory/
 * Hit F12 or whatever and open up a console tab
-* Copypaste script.js content into open console
+* Copypaste Consume-Knick-Knacks.user.js content into open console
 * Hit **ENTER**
-* Watch for the results
+* Now you will have `Consume Knick-Knacks` button
 
 ## Thanks DACER for testing!
