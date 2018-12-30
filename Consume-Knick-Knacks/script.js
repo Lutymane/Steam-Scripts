@@ -99,9 +99,16 @@ function ConsumeAssetID(i = 0)
 
                 let timePassed = msToTimeStr((new Date()).getTime() - startTime);
 
-                modal = ShowConfirmDialog('Completed!', `Successfully consumed <span style="color: lightseagreen;">${activated} Knick-Knacks</span> Time passed: ${timePassed}`
-                    + (errored ? `<br><br><span style="color:#ff7b7b;">Failed ${errored} Request${(errored == 1 ? '' : 's')}. Check console log for more info` : '',
-                    'Okay', 'Close'));
+                modal = ShowConfirmDialog('Completed!', `Successfully consumed <span style="color: lightseagreen;">${activated} Knick-Knack${(activated == 1 ? '' : 's')}</span> Time passed: ${timePassed}`
+                    + (errored ? `<br><br><span style="color:#ff7b7b;">Failed ${errored} request${(errored == 1 ? '' : 's')}. Check console log for more info` : ''),
+                    'OK', 'Close', 'By /id/lite_one');
+
+                $J('.newmodal_buttons .btn_darkblue_white_innerfade.btn_medium').click(
+                    function()
+                    {
+                        location.href = 'https://steamcommunity.com/id/lite_one';
+                    }
+                );
             }
         }
     );
@@ -163,7 +170,7 @@ function FetchAssetIDs(start = 0)
             modal = ShowConfirmDialog('Warning', `Found <span style="color:#b698cc;">${assetIDsToConsume.length} Knick-Knacks!</span>` + 
                 '<br><br><span style="color:lightseagreen;">Limit consuming</span>' +
                 '<input type="number" id="knacks_limit" style="margin-left: 20px;"><br><br>',
-                "Start"
+                "Start", "Exit"
             ).done(function()
             {
                 if(modal_input.val())//$J('#knacks_limit').val() doesn't work -- it just doesn't update the object for some reason -- needs investigation why
