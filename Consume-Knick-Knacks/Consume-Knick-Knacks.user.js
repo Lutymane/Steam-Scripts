@@ -14,7 +14,7 @@
 // ==/UserScript==
 
 const btn_id_selector = 'consume_kk';
-const btn_html = `<div class="btn_grey_black btn_medium" id="${btn_id_selector}" style="margin-right: 12px;"><span>Consume Knick-Knacks</span></div>`;
+var btn_html = `<div class="btn_grey_black btn_medium" id="${btn_id_selector}" style="margin-right: 12px;"><span>Consume Knick-Knacks</span></div>`;
 
 const appID = 991980;
 
