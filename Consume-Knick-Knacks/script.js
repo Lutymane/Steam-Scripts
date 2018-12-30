@@ -167,10 +167,14 @@ function FetchAssetIDs(start = 0)
                 {
                     limit = parseInt($J('#knacks_limit').val());
 
+                    console.log("limit parsed: " + limit);
+
                     if(limit > assetIDsToConsume.length)
                     {
                         limit = assetIDsToConsume.length;
                     }
+
+                    console.log("limit: " + limit);
 
                     if(limit > 0)
                     {
