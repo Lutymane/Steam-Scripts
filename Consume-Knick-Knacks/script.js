@@ -175,6 +175,7 @@ function FetchAssetIDs(start = 0)
                     if(limit > 0)
                     {
                         startTime = (new Date()).getTime();
+                        console.log("start consuming");
                         ConsumeAssetID();
                     }
                 }
