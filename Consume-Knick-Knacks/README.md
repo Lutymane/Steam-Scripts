@@ -6,3 +6,5 @@
 * Copypaste script.js content into open console
 * Hit **ENTER**
 * Watch for the results
+
+##Thanks DACER for testing!
