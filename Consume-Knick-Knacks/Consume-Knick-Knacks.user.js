@@ -2,7 +2,7 @@
 // @name         Consume Knick Knacks
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.0
+// @version      1.1
 // @description  Choose how many Knick-Knacks you want to consume in few clicks
 // @author       Lite_OnE
 // @match        https://steamcommunity.com/*/*/inventory*
@@ -114,7 +114,9 @@ function ConsumeAssetID(i = 0)
 
                 let timePassed = msToTimeStr((new Date()).getTime() - startTime);
 
-                modal = ShowConfirmDialog('Completed!', `Successfully consumed <span style="color: lightseagreen;">${activated} Knick-Knack${(activated == 1 ? '' : 's')}</span> Time passed: ${timePassed}`
+                modal = ShowConfirmDialog('Completed!', `Successfully consumed: <span style="color: lightseagreen;">${activated} Knick-Knack${(activated == 1 ? '' : 's')}</span>
+                    <br>Time passed: <span style="color: lightseagreen;">${timePassed}</span>
+                    <br>Percentage of successful requests: <span style="color: lightseagreen;">${Math.round((1 - errored/limit)* 100 * 100) / 100}%</span>` 
                     + (errored ? `<br><br><span style="color:#ff7b7b;">Failed ${errored} request${(errored == 1 ? '' : 's')}. Check console log for more info` : ''),
                     'OK', 'Close', 'By /id/lite_one');
 
