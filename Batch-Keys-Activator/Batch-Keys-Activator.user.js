@@ -585,7 +585,7 @@ $(document).ready(function()
 
 function Bundle_ProcessKeys()
 {
-    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + keysData.join() + (auto_activate ? '&auto=1' : ''));
+    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + keysData.join() + (settings.auto_activate ? '&auto=1' : ''));
 
     try
     {
