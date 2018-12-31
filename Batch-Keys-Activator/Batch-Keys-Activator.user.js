@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.4.2
+// @version      2.5
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -21,36 +21,91 @@
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.user.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
-var Keys                  = [];
-var AlreadyOwnedGame_Keys = [];
-var Unprocessed_Keys      = [];
-var OtherFailed_Keys      = [];
+var keys                  = [];
+var alreadyOwnedGame_keys = [];
+var unprocessed_keys      = [];
+var otherFailed_keys      = [];
 var bLimitExceeded        = false;
-var KeysAmount            = 0;
-var KeysActivatedSuc      = 0;
-var KeysFailed            = 0;
-var KeysTextarea          = null;
-var LogDisplay            = null;
+var keysAmount            = 0;
+var keysActivatedSuc      = 0;
+var keysFailed            = 0;
+var keysTextarea          = null;
+var logDisplay            = null;
 //Settings
-var SettingsModal         = '<div id="ModalBlock" style="display: none;"><div class="newmodal_background" style="opacity: 0.8; display: block;"></div><div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;"><div class="newmodal_header_border"><div class="newmodal_header"><div class="newmodal_close"></div><div class="ellipsis">Settings</div></div></div><div class="newmodal_content_border"><div class="newmodal_content" style="max-height: 562px;"><div><div><select id="parse_method" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;"><option value="rgx">Regex</option><option value="def">Default</option></select>License Keys Parsing Method</div><div><select id="log_level" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;"><option value="ext">Extended</option><option value="short">Short</option></select>Logging Level</div><div><select id="output_opt" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;"><option value="trad">Trading</option><option value="min">BKA/ASF Ready</option></select>Unused Keys Output Option</div></div></div></div></div></div>';
-var parse_method          = '';
-var log_level             = '';
-var output_opt            = '';
+var settingsModal         = `
+<div id="ModalBlock" style="display: none;">
+    <div class="newmodal_background" style="opacity: 0.8; display: block;"></div>
+    <div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;">
+        <div class="newmodal_header_border">
+            <div class="newmodal_header">
+                <div class="ellipsis">Settings</div>    
+                <div class="newmodal_close"></div>
+            </div>
+        </div>
+        <div class="newmodal_content_border">
+            <div class="newmodal_content" style="max-height: 562px;">
+                <div>
+                    <div>
+                        <select id="parse_method" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
+                            <option value="rgx">Regex</option>
+                            <option value="def">Default</option>
+                        </select>
+                        License Keys Parsing Method
+                    </div>
+                    <div>
+                        <select id="log_level" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
+                            <option value="ext">Extended</option>
+                            <option value="short">Short</option>
+                        </select>
+                        Logging Level
+                    </div>
+                    <div>
+                        <select id="output_opt" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
+                            <option value="trad">Trading</option>
+                            <option value="min">BKA/ASF Ready</option>
+                        </select>
+                        Unused Keys Output Option
+                    </div>
+                    <div>
+                        <select id="auto_agree" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
+                            <option>Disabled</option>
+                            <option>Enabled</option>
+                        </select>
+                        <span>
+                            Auto agree to the terms of the <span href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</span>
+                        </span>
+                    </div>
+                    <div>
+                        <select id="auto_activate" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
+                            <option>Disabled</option>
+                            <option>Enabled</option>
+                        </select>
+                        Auto-activate bundles
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+var settings = 
+{
+    parse_method  : '',
+    log_level     : '',
+    output_opt    : '',
+    auto_agree    : 0,
+    auto_activate : 0
+}
+
 var timestamp             = 0;
 //Collect Keys from bundle sites here
-var KeysData              = [];
+var keysData              = [];
 //Fancy Console
-var ConsoleCSS            = 'color:#FFE4E1; font-size: 15px; font-family: raleway; background-color: #F14D39';
-//**********************************************
-//You can change it to true for auto activating.
-//Keep in mind, that if you use this, you automatically agree to
-//the terms of the SSA https://store.steampowered.com/checkout/ssapopup
-var AutoActivate          = false;
-//**********************************************
+var consoleCSS            = 'color:#FFE4E1; font-size: 15px; font-family: raleway, sans-serif; background-color: #F14D39';
 
-function RegisterFailure(ePurchaseResult, receipt, key)
+function registerFailure(ePurchaseResult, receipt, key)
 {
-    KeysFailed++;
+    keysFailed++;
     
     var sErrorMessage = '';
 
@@ -109,7 +164,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
         case 9:
             try
             {
-                AlreadyOwnedGame_Keys.push(
+                alreadyOwnedGame_keys.push(
                     {
                         name: receipt.line_items[0].line_item_description,
                         key: key
@@ -117,7 +172,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             }
             catch
             {
-                AlreadyOwnedGame_Keys.push(
+                alreadyOwnedGame_keys.push(
                     {
                         name: '[error] (name undefined)',
                         key: key
@@ -127,7 +182,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
         default:
             try
             {
-                OtherFailed_Keys.push(
+                otherFailed_keys.push(
                     {
                         name: receipt.line_items[0].line_item_description,
                         key: key
@@ -135,7 +190,7 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             }
             catch
             {
-                OtherFailed_Keys.push(
+                otherFailed_keys.push(
                     {
                         name: '[error] (possibly invalid key)',
                         key: key
@@ -144,262 +199,249 @@ function RegisterFailure(ePurchaseResult, receipt, key)
             break;
     }
 
-    if(log_level == 'short')
+    if(settings.log_level == 'short')
     {
-        LogDisplay.append('<br>' + key + " | Failed! <br>");
+        logDisplay.append('<br>' + key + " | Failed! <br>");
     }
     else
     {
-        LogDisplay.append('<br>' + key + "<br><br>Failed! " + sErrorMessage + '<br><br><hr>');
+        logDisplay.append('<br>' + key + "<br><br>Failed! " + sErrorMessage + '<br><br><hr>');
     }
 }
 
-function ActivateKey(i)
+function activateKey(i)
 {
     $.post('https://store.steampowered.com/account/ajaxregisterkey/',
     {
-        product_key: Keys[i],
+        product_key: keys[i],
         sessionid: g_sessionID
-    }).done(function(Result)
+    }).done(function(result)
     {
-        if (Result !== null)
+        if (result !== null)
         {
-            if (Result.success == 1)
+            if (result.success == 1)
             {
-                KeysActivatedSuc++;
+                keysActivatedSuc++;
                 
-                if(log_level == 'short')
+                if(settings.log_level == 'short')
                 {
-                    LogDisplay.append('<br>' + Keys[i] + '| Success!<br>');    
+                    logDisplay.append('<br>' + keys[i] + '| Success!<br>');    
                 }
                 else
                 {
-                    LogDisplay.append('<br>' + Keys[i] + '<br><br>Success! Product: "' + (Result.purchase_receipt_info.line_items.length ? Result.purchase_receipt_info.line_items[0].line_item_description : '[error] (undefined name)') + '" has been added to your account.<br><br><hr>');
+                    logDisplay.append('<br>' + keys[i] + '<br><br>Success! Product: "' + (result.purchase_receipt_info.line_items.length ? result.purchase_receipt_info.line_items[0].line_item_description : '[error] (undefined name)') + '" has been added to your account.<br><br><hr>');
                 }
             }
-            else if (Result.purchase_result_details !== undefined && Result.purchase_receipt_info !== undefined)
+            else if (result.purchase_result_details !== undefined && result.purchase_receipt_info !== undefined)
             {
-                RegisterFailure(Result.purchase_result_details, Result.purchase_receipt_info, Keys[i]);
+                registerFailure(result.purchase_result_details, result.purchase_receipt_info, keys[i]);
             }
             else
             {
-                RegisterFailure(0, null, Keys[i]);
+                registerFailure(0, null, keys[i]);
             }
 
-            LogDisplay.animate({
-                scrollTop: LogDisplay[0].scrollHeight
+            logDisplay.animate({
+                scrollTop: logDisplay[0].scrollHeight
             }, 1000);
 
-            if(bLimitExceeded || KeysActivatedSuc == 50 || KeysFailed == 10 /*|| (KeysActivatedSuc + KeysFailed == 40)*/)
+            if(bLimitExceeded || keysActivatedSuc == 50 || keysFailed == 10 /*|| (KeysActivatedSuc + KeysFailed == 40)*/)
             {
                 timestamp = (new Date).getTime() + 3600000;//+ 1 hour
-                window.localStorage.setItem('timestamp', timestamp);
+                window.localStorage.setItem('bka_timestamp', timestamp);
                 
                 bLimitExceeded = true;
                 
-                for(var j = i; j < KeysAmount; j++)
+                for(var j = i; j < keysAmount; j++)
                 {
-                    Unprocessed_Keys.push(Keys[j]);
+                    unprocessed_keys.push(keys[j]);
                 }
 
-                OnActivationProcessFinished();
+                onActivationProcessFinished();
 
                 return;
             }
 
-            if (++i < KeysAmount)
+            if (++i < keysAmount)
             {
-                ActivateKey(i);
+                activateKey(i);
             }
             else
             {
-                OnActivationProcessFinished();
+                onActivationProcessFinished();
                 return;
             }
         }
     }).fail(function()
     {
-        LogDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
-        LogDisplay.append('<br><br><hr><br>Unexpected error! Try to activate later...');
+        logDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
+        logDisplay.append('<br><br><hr><br>Unexpected error! Try to activate later...');
         return;
     });
 }
 
-function PrintKeys(arr)
+function printKeys(arr)
 {
-    if(output_opt == 'min')
+    if(settings.output_opt == 'min')
     {
         for(var i = 0; i < arr.length; i++)
         {
-            LogDisplay.append(arr[i].key + (i+1 < arr.length ? ',' : ''));
+            logDisplay.append(arr[i].key + (i+1 < arr.length ? ',' : ''));
         }
     }
     else
     {
         for(var i = 0; i < arr.length; i++)
         {
-            LogDisplay.append(arr[i].name + ': ' + arr[i].key + '<br>');
+            logDisplay.append(arr[i].name + ': ' + arr[i].key + '<br>');
         }
     }
 }
 
-function OnActivationProcessFinished()
+function onActivationProcessFinished()
 {
-    LogDisplay.append('<br>');
+    logDisplay.append('<br>');
 
-    if(Unprocessed_Keys.length == 0)
+    if(unprocessed_keys.length == 0)
     {
-        if((AlreadyOwnedGame_Keys.length != 0) || (OtherFailed_Keys.length != 0))
+        if((alreadyOwnedGame_keys.length != 0) || (otherFailed_keys.length != 0))
         {
-            LogDisplay.css('background-color', 'rgba(253,215,51,0.3)');//yellow
-            LogDisplay.append('Done! All the keys have been processed, but some of the keys have failed to be activated:');
+            logDisplay.css('background-color', 'rgba(253,215,51,0.3)');//yellow
+            logDisplay.append('Done! All the keys have been processed, but some of the keys have failed to be activated:');
 
-            if(AlreadyOwnedGame_Keys.length != 0)
+            if(alreadyOwnedGame_keys.length != 0)
             {
-                LogDisplay.append('<br><br>Already Owned Game Keys:<br>');
-                PrintKeys(AlreadyOwnedGame_Keys);
+                logDisplay.append('<br><br>Already Owned Game Keys:<br>');
+                printKeys(alreadyOwnedGame_keys);
             }
 
-            if(OtherFailed_Keys.length != 0)
+            if(otherFailed_keys.length != 0)
             {
-                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>');
-                PrintKeys(OtherFailed_Keys);
+                logDisplay.append('<br><br>Keys failed due to various reasons:<br>');
+                printKeys(otherFailed_keys);
             }
         }
         else
         {
-            LogDisplay.css('background-color', 'rgba(22, 230, 22, 0.3)');//green
-            LogDisplay.append('Done! All the keys have been processed and activated successfully!');
+            logDisplay.css('background-color', 'rgba(22, 230, 22, 0.3)');//green
+            logDisplay.append('Done! All the keys have been processed and activated successfully!');
         }
     }
     else
     {
         var date = new Date(timestamp);
         
-        if((AlreadyOwnedGame_Keys.length != 0) || (OtherFailed_Keys.length != 0))
+        if((alreadyOwnedGame_keys.length != 0) || (otherFailed_keys.length != 0))
         {
-            LogDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
-            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at ' + date.getHours() + ':' + date.getMinutes() + '. Also some of the keys have failed to be activated:');
+            logDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
+            logDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at ' + date.getHours() + ':' + date.getMinutes() + '. Also some of the keys have failed to be activated:');
 
-            if(AlreadyOwnedGame_Keys.length != 0)
+            if(alreadyOwnedGame_keys.length != 0)
             {
-                LogDisplay.append('<br><br>Already Owned Game Keys:<br>');
-                PrintKeys(AlreadyOwnedGame_Keys);
+                logDisplay.append('<br><br>Already Owned Game Keys:<br>');
+                printKeys(alreadyOwnedGame_keys);
             }
 
-            if(OtherFailed_Keys.length != 0)
+            if(otherFailed_keys.length != 0)
             {
-                LogDisplay.append('<br><br>Keys failed due to various reasons:<br>');
-                PrintKeys(OtherFailed_Keys);
+                logDisplay.append('<br><br>Keys failed due to various reasons:<br>');
+                printKeys(otherFailed_keys);
             }
         }
         else
         {
-            LogDisplay.css('background-color', 'rgba(255,174,25, 0.3)');//orange
-            LogDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at '  + date.getHours() + ':' + date.getMinutes());
+            logDisplay.css('background-color', 'rgba(255,174,25, 0.3)');//orange
+            logDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at '  + date.getHours() + ':' + date.getMinutes());
         }
 
-        LogDisplay.append('<br><br>Unprocessed keys:<br>' + Unprocessed_Keys.join());
+        logDisplay.append('<br><br>Unprocessed keys:<br>' + unprocessed_keys.join());
     }
 }
 
-function DeserializeKeys(Source)
+function deserializeKeys(source)
 {
-    var Output = [];
-    Source.forEach(
-        function(elm)
+    var output = [];
+    source.forEach(
+        elm =>
         {
             if (elm)
             {
                 elm.replace(/\s+/g, '').split(',').forEach(
-                    function(elm2)
+                    elm2 =>
                     {
                         if (elm2)
                         {
-                            Output.push(elm2);
+                            output.push(elm2);
                         }
                     });
             }
         });
-    return Output;
+    return output;
 }
 
-function InitializeKeysRegistration()
+function initializeKeysRegistration()
 {
-    LogDisplay.css('display', 'inherit');
-    LogDisplay.text('');
+    logDisplay.css('display', 'inherit');
+    logDisplay.text('');
     
     if((new Date).getTime() < timestamp)
     {
         var date = new Date(timestamp);
-        LogDisplay.append('Keys Activation Cooldown has not passed yet!<br>Try to activate again at ' + date.getHours() + ':' + date.getMinutes());
+        logDisplay.append('Keys Activation Cooldown has not passed yet!<br>Try to activate again at ' + date.getHours() + ':' + date.getMinutes());
         return;
     }
     
-    if (KeysTextarea.val() != "" && $('#accept_ssa').is(':checked'))
+    if (keysTextarea.val() != "" && $('#accept_ssa').is(':checked'))
     {
-        if(parse_method == 'def')
+        if(settings.parse_method == 'def')
         {
-            Keys = DeserializeKeys(KeysTextarea.val().split('\n'));
+            keys = deserializeKeys(keysTextarea.val().split('\n'));
         }
         else
         {
-            Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+            keys = keysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
         }
        
-        /*
-        switch(parse_method)
-        {
-            case 'rgx':
-                Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
-                break;
-            case 'def':
-                Keys = DeserializeKeys(KeysTextarea.val().split('\n'));
-                break;
-            default:
-                alert('Invalid keys parsing method!');
-                return;
-        }
-        */
+        keysAmount = keys.length;
+        logDisplay.append('Processing given keys...<br><br><hr>');
 
-        KeysAmount = Keys.length;
-        LogDisplay.append('Processing given keys...<br><br><hr>');
-
-        AlreadyOwnedGame_Keys = [];
-        Unprocessed_Keys      = [];
-        OtherFailed_Keys      = [];
+        alreadyOwnedGame_keys = [];
+        unprocessed_keys      = [];
+        otherFailed_keys      = [];
         bLimitExceeded        = false;
 
-        ActivateKey(0);
+        activateKey(0);
     }
     else if (!($('#accept_ssa').is(':checked')))
     {
-        LogDisplay.html('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
+        logDisplay.html('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
     }
     else
     {
-        LogDisplay.text('You must input at least one key!');
+        logDisplay.text('You must input at least one key!');
     }
 }
 
-function OpenSettings()
+function openSettings()
 {
     $('#ModalBlock').css('display', 'block');
 
-    $('#parse_method').val(window.localStorage.getItem('parse_method'));
-    $('#log_level').val(window.localStorage.getItem('log_level'));
-    $('#output_opt').val(window.localStorage.getItem('output_opt'));
+    $('#parse_method').val(settings.parse_method);
+    $('#log_level').val(settings.log_level);
+    $('#output_opt').val(settings.output_opt);
+    $('#auto_agree').val(settings.auto_agree);
+    $('#auto_activate').val(settings.auto_activate);
 }
 
-function SaveSettings()
+function saveSettings()
 {
-    parse_method = $('#parse_method :selected').val();
-    log_level    = $('#log_level :selected').val();
-    output_opt   = $('#output_opt :selected').val();
+    settings.parse_method  = $('#parse_method :selected').val();
+    settings.log_level     = $('#log_level :selected').val();
+    settings.output_opt    = $('#output_opt :selected').val();
+    settings.auto_agree    = $('#auto_agree :selected').index();
+    settings.auto_activate = $('#auto_activate :selected').index();
 
-    window.localStorage.setItem('parse_method', parse_method);
-    window.localStorage.setItem('log_level', log_level);
-    window.localStorage.setItem('output_opt', output_opt);
+    window.localStorage.setItem('bka_settings', JSON.stringify(settings));
 
     $('#ModalBlock').css('display', 'none');
 }
@@ -410,30 +452,30 @@ $(document).ready(function()
 
     if(href.includes("indiegala.com"))
     {
-        IndieGalaProcess();
+        indieGalaProcess();
     }
     else if (href.includes("gogobundle.com") || href.includes("otakubundle.com"))
     {
-        OtakuGogoProcess();
+        otakuGogoProcess();
     }
     else if (href.includes("fanatical.com"))
     {
-        FanaticalProcess();
+        fanaticalProcess();
     }
     else if(href.includes("humblebundle.com"))
     {
-        HumbleBundleProcess();
+        humbleBundleProcess();
     }
     else if(href.includes("groupbundl.es"))
     {
-        GroupBundlesProcess();
+        groupBundlesProcess();
     }
-    else
+    else//registerkey
     {
         setTimeout(function(){
             if($('#es_activate_multiple').length)
             {
-                console.log('%c Batch Keys Activator | Enhanced Steam extension detected. Removing ES stuff... ', ConsoleCSS);
+                console.log('%c Batch Keys Activator | Enhanced Steam extension detected. Removing ES stuff... ', consoleCSS);
                 $('#es_activate_multiple').remove();
             }
 
@@ -441,70 +483,95 @@ $(document).ready(function()
             $('head').append('<link href="https://steamcommunity-a.akamaihd.net/public/css/webui/shared_application.css" rel="stylesheet" type="text/css">');
 
             $('#product_key').replaceWith($('<textarea id="product_keys" type="text" class="registerkey_input_box_text" value="">'));
-            KeysTextarea = $('#product_keys');
+            keysTextarea = $('#product_keys');
 
             if(location.href.match(/key=./))
             {
-                KeysTextarea.text(location.href.split('key=')[1].split('&')[0]);
+                keysTextarea.text(location.href.split('key=')[1].split('&')[0]);
             }
             else if(location.href.match(/keys=./))
             {
-                KeysTextarea.text(location.href.split('keys=')[1].split('&')[0]);
+                keysTextarea.text(location.href.split('keys=')[1].split('&')[0]);
             }
 
-            KeysTextarea.keydown(function(){
+            keysTextarea.keydown(function(){
                 setTimeout(function(){
-                    KeysTextarea.css('height', 'auto');
-                    KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 10 + 'px');
+                    keysTextarea.css('height', 'auto');
+                    keysTextarea.css('height', keysTextarea[0].scrollHeight + 10 + 'px');
                 }, 0);
             });
-            KeysTextarea.css('min-width', '470px');
-            KeysTextarea.css('resize', 'vertical');
-            KeysTextarea.css('padding', 0);
+            keysTextarea.css('min-width', '470px');
+            keysTextarea.css('resize', 'vertical');
+            keysTextarea.css('padding', 0);
 
-            KeysTextarea.css('max-height', '300px');
-            KeysTextarea.css('min-height', '60px');
-            KeysTextarea.css('height', 'auto');
-            KeysTextarea.css('height', KeysTextarea[0].scrollHeight + 10 + 'px');
+            keysTextarea.css('max-height', '300px');
+            keysTextarea.css('min-height', '60px');
+            keysTextarea.css('height', 'auto');
+            keysTextarea.css('height', keysTextarea[0].scrollHeight + 10 + 'px');
 
             $('#register_btn').removeAttr('href');
             $('#register_btn').attr('style', 'width:104px;text-align:center;');
-            $('#register_btn').click(function(){InitializeKeysRegistration();});
+            $('#register_btn').click(function(){initializeKeysRegistration();});
             $('#register_btn').after('<a class="btnv6_blue_hoverfade btn_medium" id="settings_btn" style="margin-top:5px;width:104px;text-align:center;"><span>Settings</span></a>');
 
-            $('.responsive_page_frame.with_header').after(SettingsModal);
+            $('.responsive_page_frame.with_header').after(settingsModal);
 
-            parse_method = window.localStorage.getItem('parse_method');
-            log_level    = window.localStorage.getItem('log_level');
-            output_opt   = window.localStorage.getItem('output_opt');
-            timestamp    = parseInt(window.localStorage.getItem('timestamp')) || 0;
+            let settings_ok = true;
 
-            if(!parse_method || !log_level || !output_opt)
+            try
             {
-                alert('Warning! The script has been updated and it wasn\'t able to find settings values. Please review your current preferences, otherwise default set up will be used');
-                $('#ModalBlock').css('display', 'block');
+                let _settings = JSON.parse(window.localStorage.getItem('bka_settings'));
+                settings = _settings;
+            }
+            catch(e)
+            {
+                settings_ok = false;
+
+                console.log(e);
+
+                //delete old settings
+                window.localStorage.removeItem('parse_method');
+                window.localStorage.removeItem('log_level');
+                window.localStorage.removeItem('output_opt');
+
+                window.localStorage.removeItem('timestamp');
             }
 
-            $('#settings_btn').click(function(){OpenSettings();});
-            $('.newmodal_close').click(function(){SaveSettings();$('#ModalBlock').css('display', 'none');});
+            timestamp = parseInt(window.localStorage.getItem('bka_timestamp')) || 0;
 
-            LogDisplay = $('#error_display');
-            LogDisplay.css('max-height', '400px');
-            LogDisplay.css('overflow','auto');
-            LogDisplay.css('background-color', 'rgba(255, 255, 255, 0.3)');
-            LogDisplay.css('display', 'none');
-            LogDisplay.css('transition', 'all 3s ease');
+            if(!settings_ok)
+            {
+                alert('Warning! The script has been updated and it wasn\'t able to find/read setting values. Please review your current preferences, otherwise default set up will be used');
+                
+                openSettings();
+                //$('#ModalBlock').css('display', 'block');
+            }
+
+            $('#settings_btn').click(function(){openSettings();});
+            $('.newmodal_close').click(function(){saveSettings();$('#ModalBlock').css('display', 'none');});
+
+            if(settings.auto_agree)
+            {
+                $('#accept_ssa').prop('checked', true);//You agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
+            }
+
+            logDisplay = $('#error_display');
+            logDisplay.css('max-height', '400px');
+            logDisplay.css('overflow','auto');
+            logDisplay.css('background-color', 'rgba(255, 255, 255, 0.3)');
+            logDisplay.css('display', 'none');
+            logDisplay.css('transition', 'all 3s ease');
 
             if(location.href.match(/auto=./))
             {
                 if(location.href.split('auto=')[1].split('&')[0] == '1')
                 {
                     $('#accept_ssa').prop('checked', true);//If you use auto, you agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
-                    LogDisplay.css('display', 'inherit');
-                    Keys = KeysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
-                    KeysAmount = Keys.length;
-                    LogDisplay.text('Processing given keys...');
-                    ActivateKey(0);
+                    logDisplay.css('display', 'inherit');
+                    keys = keysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+                    keysAmount = keys.length;
+                    logDisplay.text('Processing given keys...');
+                    activateKey(0);
                 }
             }
         }, 500);
@@ -512,13 +579,13 @@ $(document).ready(function()
 });
 
 
-//****************************************
-//***********Processing Sites************
-//****************************************
+//================================================================================
+//                         Processing Bundle Sites
+//================================================================================
 
 function Bundle_ProcessKeys()
 {
-    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + KeysData.join() + (AutoActivate ? '&auto=1' : ''));
+    var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + keysData.join() + (auto_activate ? '&auto=1' : ''));
 
     try
     {
@@ -526,12 +593,11 @@ function Bundle_ProcessKeys()
     }
     catch(e)
     {
-        alert("Pop-up Blocker is enabled! The script won't be able to redirect you to Steam until you have the Pop-up blocker enabled for this site!");
+        alert("Pop-up blocker is enabled! The script won't be able to redirect you to Steam until you have the Pop-up blocker enabled for this site!");
     }
 }
 
-//*************Group Bundles*************
-function GroupBundlesProcess()
+function groupBundlesProcess()
 {
     var isIG = false;
 
@@ -577,11 +643,11 @@ function GroupBundlesProcess()
         {
             if($('table').length)
             {
-                KeysData = $('table td').text().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
+                keysData = $('table td').text().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
             }
             else
             {
-                KeysData.push($('p').eq(0).text());
+                keysData.push($('p').eq(0).text());
             }
 
             Bundle_ProcessKeys();
@@ -589,10 +655,9 @@ function GroupBundlesProcess()
     });
 }
 
-//************IndieGala**************
 var IG_Codes = [];
 
-function IndieGalaProcess()
+function indieGalaProcess()
 {
     if(location.href.toLowerCase().includes('indiegala.com/gift'))
     {
@@ -620,7 +685,7 @@ function IndieGalaProcess()
 
             if(IG_Codes.length > 0)
             {
-                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', ConsoleCSS);
+                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', consoleCSS);
                 IndieGalaFetchKey(0);
             }
             else
@@ -671,10 +736,10 @@ function IndieGalaGiftProcess()
                         var serials = $('[id*=serial_n_]');
                         for(i = 0; i < serials.length; i++)
                         {
-                            KeysData.push(serials.eq(i).val());
+                            keysData.push(serials.eq(i).val());
                         }
 
-                        if(IG_Codes.length > 0 || KeysData.length > 0)
+                        if(IG_Codes.length > 0 || keysData.length > 0)
                         {
                             if(IG_Codes.length == 0)
                             {
@@ -683,7 +748,7 @@ function IndieGalaGiftProcess()
                             }
                             else
                             {
-                                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', ConsoleCSS);
+                                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', consoleCSS);
                                 IndieGalaFetchKey(0);
                             }
                         }
@@ -718,7 +783,7 @@ function IndieGalaFetchKey(i)
         $('#RegisterKeysIndieGala').contents().last().replaceWith(' Processing... Code: ' + i + '\\' + IG_Codes.length);
 
         $.get('https://www.indiegala.com/myserials/syncget?code=' + IG_Codes[i], function(data){
-            KeysData.push($.parseJSON(data).serial_number);
+            keysData.push($.parseJSON(data).serial_number);
             IndieGalaFetchKey(++i);
         }).fail(function(data){
             alert('Error fetching keys!');
@@ -732,8 +797,7 @@ function IndieGalaFetchKey(i)
     }
 }
 
-//*********Otaku/Gogobundle**********
-function OtakuGogoProcess()
+function otakuGogoProcess()
 {
     var keys_table = $('.hikashop_order_main_table tbody tr td fieldset table tbody').eq(1).find('tr td');
 
@@ -742,15 +806,14 @@ function OtakuGogoProcess()
     $('#ActivateKeys').click(function(){
         for(var i = 1; i < keys_table.length; i+=4)
         {
-            KeysData.push(keys_table.eq(i).text());
+            keysData.push(keys_table.eq(i).text());
         }
 
         Bundle_ProcessKeys();
     });
 }
 
-//***********Fanatical*****************
-function FanaticalProcess()
+function fanaticalProcess()
 {
     setTimeout(function(){
         $('.account-content').find('h3').after('<button type="button" id="activate" class="btn btn-secondary btn-block">Fetch and Activate All the Keys on Steam</button>');
@@ -772,7 +835,7 @@ function FanaticalProcess()
 
                 for (var j = 0; j < data.length; j++)
                 {
-                    KeysData.push(data.eq(j).attr('value'));
+                    keysData.push(data.eq(j).attr('value'));
                 }
 
                 Bundle_ProcessKeys();
@@ -783,8 +846,7 @@ function FanaticalProcess()
     }, 1500);
 }
 
-//***********HumbleBundle**************
-function HumbleBundleProcess()
+function humbleBundleProcess()
 {
     setTimeout(function(){
         $('.key-list').before('<div id="ActivateOnSteam" class="round-active-button">Redeem and Activate the Keys on Steam</a>');
@@ -800,7 +862,7 @@ function HumbleBundleProcess()
                 $('#ActivateOnSteam').text('Fetching...');
 
                 $('.keyfield.redeemed').each(function(){
-                    KeysData.push($(this).attr('title'));
+                    keysData.push($(this).attr('title'));
                 });
 
                 $('#ActivateOnSteam').text('Done! Redirecting to Steam...');
