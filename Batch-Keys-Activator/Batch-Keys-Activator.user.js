@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.5.1
+// @version      2.5.2
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -68,8 +68,8 @@ var settingsModal         = `
                     </div>
                     <div>
                         <select id="auto_agree" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
-                            <option>Disabled</option>
-                            <option>Enabled</option>
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
                         </select>
                         <span>
                             Auto agree to the terms of the <span href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</span>
@@ -77,8 +77,8 @@ var settingsModal         = `
                     </div>
                     <div>
                         <select id="auto_activate" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
-                            <option>Disabled</option>
-                            <option>Enabled</option>
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
                         </select>
                         Auto-activate bundles
                     </div>
@@ -438,10 +438,15 @@ function saveSettings()
     settings.parse_method  = $('#parse_method :selected').val();
     settings.log_level     = $('#log_level :selected').val();
     settings.output_opt    = $('#output_opt :selected').val();
-    settings.auto_agree    = $('#auto_agree :selected').index();
-    settings.auto_activate = $('#auto_activate :selected').index();
+    settings.auto_agree    = $('#auto_agree :selected').val();
+    settings.auto_activate = $('#auto_activate :selected').val();
 
     window.localStorage.setItem('bka_settings', JSON.stringify(settings));
+
+    if(settings.auto_agree)
+    {
+        $('#accept_ssa').prop('checked', true);//You agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
+    }
 
     $('#ModalBlock').css('display', 'none');
 }
@@ -521,7 +526,15 @@ $(document).ready(function()
             try
             {
                 let _settings = JSON.parse(window.localStorage.getItem('bka_settings'));
-                settings = _settings;
+
+                if(_settings != null)
+                {
+                    settings = _settings;
+                }
+                else
+                {
+                    throw 'null';
+                }
             }
             catch(e)
             {
