@@ -90,9 +90,9 @@ var settingsModal         = `
 
 var settings = 
 {
-    parse_method  : '',
-    log_level     : '',
-    output_opt    : '',
+    parse_method  : 'rgx',
+    log_level     : 'ext',
+    output_opt    : 'trad',
     auto_agree    : 0,
     auto_activate : 0
 }
