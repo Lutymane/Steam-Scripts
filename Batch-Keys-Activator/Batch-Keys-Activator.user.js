@@ -38,8 +38,8 @@ var settingsModal         = `
     <div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;">
         <div class="newmodal_header_border">
             <div class="newmodal_header">
-                <div class="ellipsis">Settings</div>    
-                <div class="newmodal_close"></div>
+                <div class="newmodal_close"></div>    
+                <div class="ellipsis">Settings</div>
             </div>
         </div>
         <div class="newmodal_content_border">
