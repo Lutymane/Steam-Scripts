@@ -2,7 +2,7 @@
 // @name         Batch Keys Activator
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.5
+// @version      2.5.1
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
 // @author       Lite_OnE
 // @match        https://store.steampowered.com/account/registerkey*
@@ -43,7 +43,7 @@ var settingsModal         = `
             </div>
         </div>
         <div class="newmodal_content_border">
-            <div class="newmodal_content" style="max-height: 562px;">
+            <div class="newmodal_content" style="max-height: 562px; overflow: visible;">
                 <div>
                     <div>
                         <select id="parse_method" class="checkout_content_box gray_bevel dynInput" style="width:130px;height:32px;margin-right: 12px;">
