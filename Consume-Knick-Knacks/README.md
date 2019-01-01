@@ -13,7 +13,7 @@ Automatically consume specified amount of Knick-Knacks
 * Open: https://steamcommunity.com/my/inventory/
 * Hit F12 or whatever and open up a console tab
 * Copypaste Consume-Knick-Knacks.user.js content into open console
-* Hit **ENTER**
+* Hit `ENTER`
 * Now you will have `Consume Knick-Knacks` button
 
 ## Thanks DACER for testing!
