@@ -1,5 +1,7 @@
 # Grind Sale Items Into Gems
 
+Grind specified amount of sale items (backgrounds and emoticons) into gems
+
 ## Userscript manager users:
 * Install Tampermonkey/Greasemonkey or similar add-on
 * Open Grind-Sale-Items-Into-Gems.user.js
