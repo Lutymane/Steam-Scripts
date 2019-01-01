@@ -1,6 +1,6 @@
 # Consume Knick-Knacks
 
-Automatically consume specified amount of Knick-Knacks
+### Automatically consume specified amount of Knick-Knacks
 
 ## Userscript manager users:
 * Install Tampermonkey/Greasemonkey or similar add-on
