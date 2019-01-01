@@ -13,5 +13,5 @@ Grind specified amount of sale items (backgrounds and emoticons) into gems
 * Open: https://steamcommunity.com/my/inventory/
 * Hit F12 or whatever and open up a console tab
 * Copypaste Grind-Sale-Items-Into-Gems.user.js content into open console
-* Hit **ENTER**
+* Hit `ENTER`
 * Now you will have `Grind Sale Items` button
