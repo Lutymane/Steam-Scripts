@@ -1,6 +1,6 @@
 # Batch Keys Activator
 
-## Activate your Steam keys faster than ever with lots of features
+### Activate your Steam keys faster than ever with lots of features
 
 ## Guide:
 * Open: https://store.steampowered.com/account/registerkey/
