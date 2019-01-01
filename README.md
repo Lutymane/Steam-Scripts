@@ -1,7 +1,10 @@
 # Userscripts for Steam
-Use Tampermonkey/Greasemonkey or similar userscript manager
 
-### Direct Install Links:
+### Use Tampermonkey/Greasemonkey or similar userscript manager
+
+### Open script's folder for descriptions and guides
+
+## Direct Install Links:
 * [Consume Knick-Knacks [1.0]](https://github.com/LiteOnE/Steam-Scripts/raw/master/Consume-Knick-Knacks/Consume-Knick-Knacks.user.js)
 
 * [Grind Sale Items Into Gems [2.0]](https://github.com/LiteOnE/Steam-Scripts/raw/master/Grind-Sale-Items-Into-Gems/Grind-Sale-Items-Into-Gems.user.js)
