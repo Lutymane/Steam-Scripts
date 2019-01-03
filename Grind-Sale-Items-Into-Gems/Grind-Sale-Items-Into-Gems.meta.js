@@ -1,4 +1,4 @@
 // ==UserScript==
 // @name         Grind Sale Items Into Gems
-// @version      2.0
+// @version      2.1
 // ==/UserScript==

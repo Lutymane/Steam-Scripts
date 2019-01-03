@@ -2,7 +2,7 @@
 // @name         Grind Sale Items Into Gems
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      2.0
+// @version      2.1
 // @description  Choose how many and what sale items you want to grind into gems in few clicks
 // @author       Lite_OnE
 // @match        https://steamcommunity.com/*/*/inventory*
