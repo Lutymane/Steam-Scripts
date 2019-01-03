@@ -1,39 +1,54 @@
 var str = '';
 
-var page_count = $J('#searchResults_links').children().length;
-const class_bg = 3;
-const class_emot = 4;
+var class_bg = 3;
+var class_emot = 4;
 
 var item_class = class_emot;
 
-var link = `https://steamcommunity.com/market/search?q=&category_753_Game%5B%5D=any&category_753_Event%5B%5D=tag_wintersale2018&category_753_item_class%5B%5D=tag_item_class_${item_class}&appid=753`;
+var link = `https://steamcommunity.com/market/search/render/?query=&start=0&count=100&search_descriptions=0&sort_column=name&sort_dir=asc&appid=753&category_753_Game[]=any&category_753_Event[]=tag_wintersale2018&category_753_item_class[]=tag_item_class_${item_class}`;
 
-for(let i = 1; i <= page_count; i += 1){
+var count_total = 0;
+var count_cur   = 0;
 
-    $J.ajax(
+$J.get(link).done(
+    data => 
+    {
+        var rgx = /https:\/\/steamcommunity.com\/market\/listings\/753\/[-%A-Za-z0-9_]+/g;
+        items = data['results_html'].match(rgx);
+        count_total = items.length;
+        
+        for(let i = 0; i < count_total; i += 1)
         {
-            url: link + `#p${i}_name_asc`,
-            async: false
-        }
-    ).done((data) => {
-        $J.each(
-            $J(data).find('.market_listing_row_link')
-            , (index, e) => 
+            if(i % 5 == 0)
             {
-               $J.ajax(
-                   {
-                       url: $J(e).attr('href'),
-                       async: false
-                   }
-               ).done(function(data){
-                    var classid = data.split('"classid":"')[1].split('"')[0];
-                    str += '"' + classid + '",';
-                });
+                str += '\n';
             }
-        );
-    });
+            
+            $J.ajax(
+                {
+                    url: items[i],
+                    async: false
+                }
+            ).done(
+                item =>
+                {
+                    var classid = "";
+                    
+                    try
+                    {
+                        classid = item.split('"classid":"')[1].split('"')[0];
+                    }
+                    catch(e)
+                    {
+                        console.log(item);
+                        return;
+                    }
+                    
+                    str += '"' + classid + '",';
+                }
+            );
+        }
 
-    str += '\n';
-}
-
-console.log(str);
+        console.log(str);
+    }
+);
