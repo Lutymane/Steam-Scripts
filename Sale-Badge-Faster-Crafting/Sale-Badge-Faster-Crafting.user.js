@@ -20,7 +20,7 @@ const btn_id_selector = 'btnCraftFaster';
 
 var btn_html = `
 <a id="${btn_id_selector}" class="btn_darkred_white_innerfade btn_medium" style="margin-right: 15px;">
-    <span>Craft Levels Faster</span>
+    <span>Craft Sets Faster</span>
 </a>`;
 
 var appID = 0;
@@ -37,7 +37,7 @@ var errored = 0;
 
 var startTime = 0;
 
-function craftBadge(i = 0)
+function craftSet(i = 0)
 {
     let submitURL = profile_url + "/ajaxcraftbadge/";
 
@@ -100,7 +100,7 @@ function craftBadge(i = 0)
     if(i < limit)
     {
         setTimeout(() => {
-            craftBadge(i);
+            craftSet(i);
         }, timeout);
     }
 }
@@ -147,7 +147,7 @@ function prepare()
                         `<span style="color: lightseagreen;">Crafting badges: ${errored + crafted}/${limit}</span>`
                         + (errored ? `<br><span style="color:#b698cc;">Failed: ${errored}</span>` : '') + '</div>' );
 
-                craftBadge();
+                craftSet();
             }
         }
     });
