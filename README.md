@@ -4,7 +4,7 @@
 
 ### Open script's folder for descriptions and guides
 
-# If you want to support me, feel free to [send a trade offer](https://steamcommunity.com/tradeoffer/new/?partner=151993701&token=yim1BYNv)
+# If you want to support me, feel free to [support me on Patreon](https://www.patreon.com/xeox) or [send a trade offer](https://steamcommunity.com/tradeoffer/new/?partner=151993701&token=yim1BYNv)
 
 ## Direct Install Links:
 * [Consume Knick-Knacks [1.1]](https://github.com/LiteOnE/Steam-Scripts/raw/master/Consume-Knick-Knacks/Consume-Knick-Knacks.user.js)
