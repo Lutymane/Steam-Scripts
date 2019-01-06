@@ -44,7 +44,7 @@ function craftBadge(i = 0)
     $J.post(submitURL, {
         appid: appID,
         series: 1,
-        border_color: 1,
+        border_color: 0,
         sessionid: g_sessionID
     }).done((data)=>{
         if(data["success"] == 1)
@@ -157,7 +157,7 @@ function prepare()
 }
 
 $J(()=>{
-    $J('.gamecards_inventorylink a.btn_grey_grey.btn_medium').after(btn_html);
+    $J('.gamecards_inventorylink a.btn_grey_grey.btn_medium').first().before(btn_html);
     
     $J(`#${btn_id_selector}`).click(prepare);
 });
