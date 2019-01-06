@@ -19,14 +19,14 @@
 const btn_id_selector = 'btnCraftFaster';
 
 var btn_html = `
-<a id="${btn_id_selector}" class="btn_darkred_white_innerfade btn_medium" style="margin-left: 15px;">
+<a id="${btn_id_selector}" class="btn_darkred_white_innerfade btn_medium" style="margin-right: 15px;">
     <span>Craft Levels Faster</span>
 </a>`;
 
 var appID = 0;
 var profileURL = '';
 
-const timeout = 50;//ms
+const timeout = 100;//ms
 
 var modal = null;
 
