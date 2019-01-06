@@ -10,7 +10,7 @@
 // @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
 // @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Sale-Badge-Faster-Crafting/Sale-Badge-Faster-Crafting.meta.js
 // @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Sale-Badge-Faster-Crafting/Sale-Badge-Faster-Crafting.user.js
-// @require      https://github.com/LiteOnE/Steam-Scripts/raw/master/libs/msToTimeStr.js
+// @require      https://github.com/LiteOnE/Steam-Scripts/raw/dev/libs/msToTimeStr.js
 // ==/UserScript==
 
 //msToTimeStr
