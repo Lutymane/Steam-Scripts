@@ -1,54 +1,48 @@
-var str = '';
+const classes = {
+    bg: 3,
+    emot: 4
+}
 
-var class_bg = 3;
-var class_emot = 4;
+const seasons = {
+    winter: 'wintersale',
+    summer: 'summersale'
+}
 
-var item_class = class_emot;
+let query_params = {
+    class: classes.bg,
+    year: 2019,
+    season = seasons.winter
+}
 
-var link = `https://steamcommunity.com/market/search/render/?query=&start=0&count=100&search_descriptions=0&sort_column=name&sort_dir=asc&appid=753&category_753_Game[]=any&category_753_Event[]=tag_wintersale2018&category_753_item_class[]=tag_item_class_${item_class}`;
+let fetch_link = `https://steamcommunity.com/market/search/render/?query=&start=0&count=100&search_descriptions=0&sort_column=name&sort_dir=asc&appid=753&category_753_Game[]=any&category_753_Event[]=tag_${query_params.season}${query_params.year}&category_753_item_class[]=tag_item_class_${query_params.class}`;
 
-var count_total = 0;
-var count_cur   = 0;
+let count_total = 0;
+let count_cur = 0;
 
-$J.get(link).done(
-    data => 
-    {
-        var rgx = /https:\/\/steamcommunity.com\/market\/listings\/753\/[-%A-Za-z0-9_]+/g;
-        items = data['results_html'].match(rgx);
-        count_total = items.length;
-        
-        for(let i = 0; i < count_total; i += 1)
-        {
-            if(i % 5 == 0)
-            {
-                str += '\n';
-            }
-            
-            $J.ajax(
-                {
-                    url: items[i],
-                    async: false
-                }
-            ).done(
-                item =>
-                {
-                    var classid = "";
-                    
-                    try
-                    {
-                        classid = item.split('"classid":"')[1].split('"')[0];
+let result_string = '';
+
+$J.get(fetch_link).done(
+    data => {
+        let item_link_regex = /https:\/\/steamcommunity.com\/market\/listings\/753\/[-%A-Za-z0-9_]+/g;
+        let item_links = data.results_html.match(item_link_regex);
+        count_total = item_links.length;
+
+        for (let i = 0; i < count_total; i += 1) {
+            $J.get(item_links[i]).done(
+                item => {
+                    let classid = item.split('"classid":"')[1].split('"')[0];
+                    result_string += '"' + classid + '",';
+
+                    count_cur += 1;
+
+                    if (count_cur == count_total) {
+                        console.log(result_string);
                     }
-                    catch(e)
-                    {
-                        console.log(item);
-                        return;
+                    else if (count_cur % 5 == 0) {
+                        result_string += '\n';
                     }
-                    
-                    str += '"' + classid + '",';
                 }
             );
         }
-
-        console.log(str);
     }
 );
