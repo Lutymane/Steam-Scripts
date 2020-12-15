@@ -2,7 +2,7 @@
 // @name         Sale Badge Faster Crafting
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    top_xex
-// @version      1.1
+// @version      1.1.1
 // @description  Craft your sale badge faster
 // @author       Lite_OnE
 // @match        https://steamcommunity.com/*/*/gamecards/*
@@ -74,10 +74,10 @@ function craftSet(i = 0) {
                     <br>Time passed: <span style="color: lightseagreen;">${timePassed}</span>
                     <br>Percentage of successful requests: <span style="color: lightseagreen;">${Math.round((1 - errored / limit) * 100 * 100) / 100}%</span>`
                     + (errored ? `<br><br><span style="color:#ff7b7b;">Failed ${errored} request${(errored == 1 ? '' : 's')}. Check console log for more info` : ''),
-                    'OK', 'Close', 'By /id/lite_one').done(
+                    'OK', 'Close', 'By luty').done(
                         function (btn_type) {
                             if (btn_type == 'SECONDARY') {
-                                location.href = 'https://steamcommunity.com/id/lite_one';
+                                location.href = 'https://steamcommunity.com/profiles/76561198112259429';
                             }
                         }
                     );
