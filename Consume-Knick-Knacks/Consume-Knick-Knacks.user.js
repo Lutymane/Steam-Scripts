@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Consume Knick Knacks
 // @icon         https://store.steampowered.com/favicon.ico
-// @namespace    top_xex
+// @namespace    steam
 // @version      1.1
 // @description  Choose how many Knick-Knacks you want to consume in few clicks
 // @author       Lutymane

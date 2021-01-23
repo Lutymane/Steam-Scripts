@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Guide Editing
 // @icon         https://store.steampowered.com/favicon.ico
-// @namespace    top_xex
+// @namespace    steam
 // @version      2.4
 // @description  Save guide subsections with empty titles and 'unlimited' body text length.
 // @author       Lutymane

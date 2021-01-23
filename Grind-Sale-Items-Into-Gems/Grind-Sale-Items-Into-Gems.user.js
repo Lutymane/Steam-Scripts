@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Grind Sale Items Into Gems
 // @icon         https://store.steampowered.com/favicon.ico
-// @namespace    top_xex
+// @namespace    steam
 // @version      2.4
 // @description  Choose how many and what sale items you want to grind into gems in few clicks
 // @author       Lutymane

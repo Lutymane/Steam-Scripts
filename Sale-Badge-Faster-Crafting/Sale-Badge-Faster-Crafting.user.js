@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Sale Badge Faster Crafting
 // @icon         https://store.steampowered.com/favicon.ico
-// @namespace    top_xex
+// @namespace    steam
 // @version      1.1.1
 // @description  Craft your sale badge faster
 // @author       Lutymane

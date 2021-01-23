@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Game Inventories Count
 // @icon         https://store.steampowered.com/favicon.ico
-// @namespace    top_xex
+// @namespace    steam
 // @version      1.7
 // @description  It shows how many game inventories user has
 // @author       Lutymane

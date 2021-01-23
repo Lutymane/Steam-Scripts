@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animated Avatar
 // @icon         https://store.steampowered.com/favicon.ico
-// @namespace    top_xex
+// @namespace    steam
 // @version      5.1
 // @description  Makes your profile picture animated using standard game avatars on Steam
 // @author       Lutymane
