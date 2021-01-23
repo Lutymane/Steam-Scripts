@@ -4,12 +4,12 @@
 // @namespace    top_xex
 // @version      5.1
 // @description  Makes your profile picture animated using standard game avatars on Steam
-// @author       Lite_OnE
+// @author       Lutymane
 // @match        https://steamcommunity.com/id/*
-// @homepageURL  https://xeox.xyz
-// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
-// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Animated-Avatar/Animated-Avatar.meta.js
-// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Animated-Avatar/Animated-Avatar.user.js
+// @homepageURL  https://github.com/Lutymane/Steam-Scripts
+// @supportURL   https://github.com/Lutymane/Steam-Scripts/issues
+// @updateURL    https://github.com/Lutymane/Steam-Scripts/raw/master/Animated-Avatar/Animated-Avatar.meta.js
+// @downloadURL  https://github.com/Lutymane/Steam-Scripts/raw/master/Animated-Avatar/Animated-Avatar.user.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 

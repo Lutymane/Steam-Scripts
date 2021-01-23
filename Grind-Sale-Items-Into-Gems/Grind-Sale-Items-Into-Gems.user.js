@@ -4,14 +4,14 @@
 // @namespace    top_xex
 // @version      2.4
 // @description  Choose how many and what sale items you want to grind into gems in few clicks
-// @author       Lite_OnE
+// @author       Lutymane
 // @match        https://steamcommunity.com/*/*/inventory*
 // @match        https://steamcommunity.com/*/*/inventory/*
-// @homepageURL  https://xeox.xyz
-// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
-// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Grind-Sale-Items-Into-Gems/Grind-Sale-Items-Into-Gems.meta.js
-// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Grind-Sale-Items-Into-Gems/Grind-Sale-Items-Into-Gems.user.js
-// @require      https://github.com/LiteOnE/Steam-Scripts/raw/master/libs/msToTimeStr.js
+// @homepageURL  https://github.com/Lutymane/Steam-Scripts
+// @supportURL   https://github.com/Lutymane/Steam-Scripts/issues
+// @updateURL    https://github.com/Lutymane/Steam-Scripts/raw/master/Grind-Sale-Items-Into-Gems/Grind-Sale-Items-Into-Gems.meta.js
+// @downloadURL  https://github.com/Lutymane/Steam-Scripts/raw/master/Grind-Sale-Items-Into-Gems/Grind-Sale-Items-Into-Gems.user.js
+// @require      https://github.com/Lutymane/Steam-Scripts/raw/master/libs/msToTimeStr.js
 // ==/UserScript==
 
 //classids must be strings!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

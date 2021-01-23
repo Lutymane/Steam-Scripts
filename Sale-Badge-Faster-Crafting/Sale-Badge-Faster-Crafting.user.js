@@ -4,13 +4,13 @@
 // @namespace    top_xex
 // @version      1.1.1
 // @description  Craft your sale badge faster
-// @author       Lite_OnE
+// @author       Lutymane
 // @match        https://steamcommunity.com/*/*/gamecards/*
-// @homepageURL  https://xeox.xyz
-// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
-// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Sale-Badge-Faster-Crafting/Sale-Badge-Faster-Crafting.meta.js
-// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Sale-Badge-Faster-Crafting/Sale-Badge-Faster-Crafting.user.js
-// @require      https://github.com/LiteOnE/Steam-Scripts/raw/master/libs/msToTimeStr.js
+// @homepageURL  https://github.com/Lutymane/Steam-Scripts
+// @supportURL   https://github.com/Lutymane/Steam-Scripts/issues
+// @updateURL    https://github.com/Lutymane/Steam-Scripts/raw/master/Sale-Badge-Faster-Crafting/Sale-Badge-Faster-Crafting.meta.js
+// @downloadURL  https://github.com/Lutymane/Steam-Scripts/raw/master/Sale-Badge-Faster-Crafting/Sale-Badge-Faster-Crafting.user.js
+// @require      https://github.com/Lutymane/Steam-Scripts/raw/master/libs/msToTimeStr.js
 // ==/UserScript==
 
 //msToTimeStr

@@ -4,7 +4,7 @@
 // @namespace    top_xex
 // @version      2.5.2
 // @description  Activate a bunch of keys at once. Many thanks to Delite for helping with some css stuff, motivation and testing
-// @author       Lite_OnE
+// @author       Lutymane
 // @match        https://store.steampowered.com/account/registerkey*
 // @match        https://www.indiegala.com/profile?user_id=*
 // @match        https://www.indiegala.com/gift?gift_id=*
@@ -15,24 +15,24 @@
 // @match        https://www.fanatical.com/*/orders/*
 // @match        https://www.humblebundle.com/downloads?key=*
 // @match        https://groupbundl.es/buy/*
-// @homepageURL  https://xeox.xyz
-// @supportURL   https://github.com/LiteOnE/Steam-Scripts/issues
-// @updateURL    https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.meta.js
-// @downloadURL  https://github.com/LiteOnE/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.user.js
+// @homepageURL  https://github.com/Lutymane/Steam-Scripts
+// @supportURL   https://github.com/Lutymane/Steam-Scripts/issues
+// @updateURL    https://github.com/Lutymane/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.meta.js
+// @downloadURL  https://github.com/Lutymane/Steam-Scripts/raw/master/Batch-Keys-Activator/Batch-Keys-Activator.user.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
-var keys                  = [];
+var keys = [];
 var alreadyOwnedGame_keys = [];
-var unprocessed_keys      = [];
-var otherFailed_keys      = [];
-var bLimitExceeded        = false;
-var keysAmount            = 0;
-var keysActivatedSuc      = 0;
-var keysFailed            = 0;
-var keysTextarea          = null;
-var logDisplay            = null;
+var unprocessed_keys = [];
+var otherFailed_keys = [];
+var bLimitExceeded = false;
+var keysAmount = 0;
+var keysActivatedSuc = 0;
+var keysFailed = 0;
+var keysTextarea = null;
+var logDisplay = null;
 //Settings
-var settingsModal         = `
+var settingsModal = `
 <div id="ModalBlock" style="display: none;">
     <div class="newmodal_background" style="opacity: 0.8; display: block;"></div>
     <div class="newmodal" style="position: fixed; z-index: 1000; max-width: 600px; left: 701px; top: 261px;">
@@ -88,29 +88,27 @@ var settingsModal         = `
     </div>
 </div>`;
 
-var settings = 
+var settings =
 {
-    parse_method  : 'rgx',
-    log_level     : 'ext',
-    output_opt    : 'trad',
-    auto_agree    : 0,
-    auto_activate : 0
+    parse_method: 'rgx',
+    log_level: 'ext',
+    output_opt: 'trad',
+    auto_agree: 0,
+    auto_activate: 0
 }
 
-var timestamp             = 0;
+var timestamp = 0;
 //Collect Keys from bundle sites here
-var keysData              = [];
+var keysData = [];
 //Fancy Console
-var consoleCSS            = 'color:#FFE4E1; font-size: 15px; font-family: raleway, sans-serif; background-color: #F14D39';
+var consoleCSS = 'color:#FFE4E1; font-size: 15px; font-family: raleway, sans-serif; background-color: #F14D39';
 
-function registerFailure(ePurchaseResult, receipt, key)
-{
+function registerFailure(ePurchaseResult, receipt, key) {
     keysFailed++;
-    
+
     var sErrorMessage = '';
 
-    switch (ePurchaseResult)
-    {
+    switch (ePurchaseResult) {
         case 14:
             sErrorMessage = 'The product code you\'ve entered is not valid. Please double check to see if you\'ve mistyped your key. I, L, and 1 can look alike, as can V and Y, and 0 and O.';
             break;
@@ -156,14 +154,12 @@ function registerFailure(ePurchaseResult, receipt, key)
             break;
     }
 
-    switch (ePurchaseResult)
-    {
+    switch (ePurchaseResult) {
         case 53:
             bLimitExceeded = true;
             break;
         case 9:
-            try
-            {
+            try {
                 alreadyOwnedGame_keys.push(
                     {
                         name: receipt.line_items[0].line_item_description,
@@ -180,8 +176,7 @@ function registerFailure(ePurchaseResult, receipt, key)
             }
             break;
         default:
-            try
-            {
+            try {
                 otherFailed_keys.push(
                     {
                         name: receipt.line_items[0].line_item_description,
@@ -199,178 +194,142 @@ function registerFailure(ePurchaseResult, receipt, key)
             break;
     }
 
-    if(settings.log_level == 'short')
-    {
+    if (settings.log_level == 'short') {
         logDisplay.append('<br>' + key + " | Failed! <br>");
     }
-    else
-    {
+    else {
         logDisplay.append('<br>' + key + "<br><br>Failed! " + sErrorMessage + '<br><br><hr>');
     }
 }
 
-function activateKey(i)
-{
+function activateKey(i) {
     $.post('https://store.steampowered.com/account/ajaxregisterkey/',
-    {
-        product_key: keys[i],
-        sessionid: g_sessionID
-    }).done(function(result)
-    {
-        if (result !== null)
         {
-            if (result.success == 1)
-            {
-                keysActivatedSuc++;
-                
-                if(settings.log_level == 'short')
-                {
-                    logDisplay.append('<br>' + keys[i] + '| Success!<br>');    
-                }
-                else
-                {
-                    logDisplay.append('<br>' + keys[i] + '<br><br>Success! Product: "' + (result.purchase_receipt_info.line_items.length ? result.purchase_receipt_info.line_items[0].line_item_description : '[error] (undefined name)') + '" has been added to your account.<br><br><hr>');
-                }
-            }
-            else if (result.purchase_result_details !== undefined && result.purchase_receipt_info !== undefined)
-            {
-                registerFailure(result.purchase_result_details, result.purchase_receipt_info, keys[i]);
-            }
-            else
-            {
-                registerFailure(0, null, keys[i]);
-            }
+            product_key: keys[i],
+            sessionid: g_sessionID
+        }).done(function (result) {
+            if (result !== null) {
+                if (result.success == 1) {
+                    keysActivatedSuc++;
 
-            logDisplay.animate({
-                scrollTop: logDisplay[0].scrollHeight
-            }, 1000);
-
-            if(bLimitExceeded || keysActivatedSuc == 50 || keysFailed == 10 /*|| (KeysActivatedSuc + KeysFailed == 40)*/)
-            {
-                timestamp = (new Date).getTime() + 3600000;//+ 1 hour
-                window.localStorage.setItem('bka_timestamp', timestamp);
-                
-                bLimitExceeded = true;
-                
-                for(var j = i; j < keysAmount; j++)
-                {
-                    unprocessed_keys.push(keys[j]);
+                    if (settings.log_level == 'short') {
+                        logDisplay.append('<br>' + keys[i] + '| Success!<br>');
+                    }
+                    else {
+                        logDisplay.append('<br>' + keys[i] + '<br><br>Success! Product: "' + (result.purchase_receipt_info.line_items.length ? result.purchase_receipt_info.line_items[0].line_item_description : '[error] (undefined name)') + '" has been added to your account.<br><br><hr>');
+                    }
+                }
+                else if (result.purchase_result_details !== undefined && result.purchase_receipt_info !== undefined) {
+                    registerFailure(result.purchase_result_details, result.purchase_receipt_info, keys[i]);
+                }
+                else {
+                    registerFailure(0, null, keys[i]);
                 }
 
-                onActivationProcessFinished();
+                logDisplay.animate({
+                    scrollTop: logDisplay[0].scrollHeight
+                }, 1000);
 
-                return;
-            }
+                if (bLimitExceeded || keysActivatedSuc == 50 || keysFailed == 10 /*|| (KeysActivatedSuc + KeysFailed == 40)*/) {
+                    timestamp = (new Date).getTime() + 3600000;//+ 1 hour
+                    window.localStorage.setItem('bka_timestamp', timestamp);
 
-            if (++i < keysAmount)
-            {
-                activateKey(i);
+                    bLimitExceeded = true;
+
+                    for (var j = i; j < keysAmount; j++) {
+                        unprocessed_keys.push(keys[j]);
+                    }
+
+                    onActivationProcessFinished();
+
+                    return;
+                }
+
+                if (++i < keysAmount) {
+                    activateKey(i);
+                }
+                else {
+                    onActivationProcessFinished();
+                    return;
+                }
             }
-            else
-            {
-                onActivationProcessFinished();
-                return;
-            }
-        }
-    }).fail(function()
-    {
-        logDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
-        logDisplay.append('<br><br><hr><br>Unexpected error! Try to activate later...');
-        return;
-    });
+        }).fail(function () {
+            logDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
+            logDisplay.append('<br><br><hr><br>Unexpected error! Try to activate later...');
+            return;
+        });
 }
 
-function printKeys(arr)
-{
-    if(settings.output_opt == 'min')
-    {
-        for(var i = 0; i < arr.length; i++)
-        {
-            logDisplay.append(arr[i].key + (i+1 < arr.length ? ',' : ''));
+function printKeys(arr) {
+    if (settings.output_opt == 'min') {
+        for (var i = 0; i < arr.length; i++) {
+            logDisplay.append(arr[i].key + (i + 1 < arr.length ? ',' : ''));
         }
     }
-    else
-    {
-        for(var i = 0; i < arr.length; i++)
-        {
+    else {
+        for (var i = 0; i < arr.length; i++) {
             logDisplay.append(arr[i].name + ': ' + arr[i].key + '<br>');
         }
     }
 }
 
-function onActivationProcessFinished()
-{
+function onActivationProcessFinished() {
     logDisplay.append('<br>');
 
-    if(unprocessed_keys.length == 0)
-    {
-        if((alreadyOwnedGame_keys.length != 0) || (otherFailed_keys.length != 0))
-        {
+    if (unprocessed_keys.length == 0) {
+        if ((alreadyOwnedGame_keys.length != 0) || (otherFailed_keys.length != 0)) {
             logDisplay.css('background-color', 'rgba(253,215,51,0.3)');//yellow
             logDisplay.append('Done! All the keys have been processed, but some of the keys have failed to be activated:');
 
-            if(alreadyOwnedGame_keys.length != 0)
-            {
+            if (alreadyOwnedGame_keys.length != 0) {
                 logDisplay.append('<br><br>Already Owned Game Keys:<br>');
                 printKeys(alreadyOwnedGame_keys);
             }
 
-            if(otherFailed_keys.length != 0)
-            {
+            if (otherFailed_keys.length != 0) {
                 logDisplay.append('<br><br>Keys failed due to various reasons:<br>');
                 printKeys(otherFailed_keys);
             }
         }
-        else
-        {
+        else {
             logDisplay.css('background-color', 'rgba(22, 230, 22, 0.3)');//green
             logDisplay.append('Done! All the keys have been processed and activated successfully!');
         }
     }
-    else
-    {
+    else {
         var date = new Date(timestamp);
-        
-        if((alreadyOwnedGame_keys.length != 0) || (otherFailed_keys.length != 0))
-        {
+
+        if ((alreadyOwnedGame_keys.length != 0) || (otherFailed_keys.length != 0)) {
             logDisplay.css('background-color', 'rgba(230, 10, 22, 0.3)');//red
             logDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at ' + date.getHours() + ':' + date.getMinutes() + '. Also some of the keys have failed to be activated:');
 
-            if(alreadyOwnedGame_keys.length != 0)
-            {
+            if (alreadyOwnedGame_keys.length != 0) {
                 logDisplay.append('<br><br>Already Owned Game Keys:<br>');
                 printKeys(alreadyOwnedGame_keys);
             }
 
-            if(otherFailed_keys.length != 0)
-            {
+            if (otherFailed_keys.length != 0) {
                 logDisplay.append('<br><br>Keys failed due to various reasons:<br>');
                 printKeys(otherFailed_keys);
             }
         }
-        else
-        {
+        else {
             logDisplay.css('background-color', 'rgba(255,174,25, 0.3)');//orange
-            logDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at '  + date.getHours() + ':' + date.getMinutes());
+            logDisplay.append('Activation limit exceeded! Some of the keys have not been activated! Try again at ' + date.getHours() + ':' + date.getMinutes());
         }
 
         logDisplay.append('<br><br>Unprocessed keys:<br>' + unprocessed_keys.join());
     }
 }
 
-function deserializeKeys(source)
-{
+function deserializeKeys(source) {
     var output = [];
     source.forEach(
-        elm =>
-        {
-            if (elm)
-            {
+        elm => {
+            if (elm) {
                 elm.replace(/\s+/g, '').split(',').forEach(
-                    elm2 =>
-                    {
-                        if (elm2)
-                        {
+                    elm2 => {
+                        if (elm2) {
                             output.push(elm2);
                         }
                     });
@@ -379,51 +338,43 @@ function deserializeKeys(source)
     return output;
 }
 
-function initializeKeysRegistration()
-{
+function initializeKeysRegistration() {
     logDisplay.css('display', 'inherit');
     logDisplay.text('');
-    
-    if((new Date).getTime() < timestamp)
-    {
+
+    if ((new Date).getTime() < timestamp) {
         var date = new Date(timestamp);
         logDisplay.append('Keys Activation Cooldown has not passed yet!<br>Try to activate again at ' + date.getHours() + ':' + date.getMinutes());
         return;
     }
-    
-    if (keysTextarea.val() != "" && $('#accept_ssa').is(':checked'))
-    {
-        if(settings.parse_method == 'def')
-        {
+
+    if (keysTextarea.val() != "" && $('#accept_ssa').is(':checked')) {
+        if (settings.parse_method == 'def') {
             keys = deserializeKeys(keysTextarea.val().split('\n'));
         }
-        else
-        {
+        else {
             keys = keysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
         }
-       
+
         keysAmount = keys.length;
         logDisplay.append('Processing given keys...<br><br><hr>');
 
         alreadyOwnedGame_keys = [];
-        unprocessed_keys      = [];
-        otherFailed_keys      = [];
-        bLimitExceeded        = false;
+        unprocessed_keys = [];
+        otherFailed_keys = [];
+        bLimitExceeded = false;
 
         activateKey(0);
     }
-    else if (!($('#accept_ssa').is(':checked')))
-    {
+    else if (!($('#accept_ssa').is(':checked'))) {
         logDisplay.html('You must agree to the terms of the <a href="javascript:SSAPopup();" class="body_link">Steam Subscriber Agreement</a>!');
     }
-    else
-    {
+    else {
         logDisplay.text('You must input at least one key!');
     }
 }
 
-function openSettings()
-{
+function openSettings() {
     $('#ModalBlock').css('display', 'block');
 
     $('#parse_method').val(settings.parse_method);
@@ -433,53 +384,44 @@ function openSettings()
     $('#auto_activate').val(settings.auto_activate);
 }
 
-function saveSettings()
-{
-    settings.parse_method  = $('#parse_method :selected').val();
-    settings.log_level     = $('#log_level :selected').val();
-    settings.output_opt    = $('#output_opt :selected').val();
-    settings.auto_agree    = $('#auto_agree :selected').val();
+function saveSettings() {
+    settings.parse_method = $('#parse_method :selected').val();
+    settings.log_level = $('#log_level :selected').val();
+    settings.output_opt = $('#output_opt :selected').val();
+    settings.auto_agree = $('#auto_agree :selected').val();
     settings.auto_activate = $('#auto_activate :selected').val();
 
     window.localStorage.setItem('bka_settings', JSON.stringify(settings));
 
-    if(settings.auto_agree)
-    {
+    if (settings.auto_agree) {
         $('#accept_ssa').prop('checked', true);//You agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
     }
 
     $('#ModalBlock').css('display', 'none');
 }
 
-$(document).ready(function()
-{
+$(document).ready(function () {
     var href = location.href.toLowerCase();
 
-    if(href.includes("indiegala.com"))
-    {
+    if (href.includes("indiegala.com")) {
         indieGalaProcess();
     }
-    else if (href.includes("gogobundle.com") || href.includes("otakubundle.com"))
-    {
+    else if (href.includes("gogobundle.com") || href.includes("otakubundle.com")) {
         otakuGogoProcess();
     }
-    else if (href.includes("fanatical.com"))
-    {
+    else if (href.includes("fanatical.com")) {
         fanaticalProcess();
     }
-    else if(href.includes("humblebundle.com"))
-    {
+    else if (href.includes("humblebundle.com")) {
         humbleBundleProcess();
     }
-    else if(href.includes("groupbundl.es"))
-    {
+    else if (href.includes("groupbundl.es")) {
         groupBundlesProcess();
     }
     else//registerkey
     {
-        setTimeout(function(){
-            if($('#es_activate_multiple').length)
-            {
+        setTimeout(function () {
+            if ($('#es_activate_multiple').length) {
                 console.log('%c Batch Keys Activator | Enhanced Steam extension detected. Removing ES stuff... ', consoleCSS);
                 $('#es_activate_multiple').remove();
             }
@@ -490,17 +432,15 @@ $(document).ready(function()
             $('#product_key').replaceWith($('<textarea id="product_keys" type="text" class="registerkey_input_box_text" value="">'));
             keysTextarea = $('#product_keys');
 
-            if(location.href.match(/key=./))
-            {
+            if (location.href.match(/key=./)) {
                 keysTextarea.text(location.href.split('key=')[1].split('&')[0]);
             }
-            else if(location.href.match(/keys=./))
-            {
+            else if (location.href.match(/keys=./)) {
                 keysTextarea.text(location.href.split('keys=')[1].split('&')[0]);
             }
 
-            keysTextarea.keydown(function(){
-                setTimeout(function(){
+            keysTextarea.keydown(function () {
+                setTimeout(function () {
                     keysTextarea.css('height', 'auto');
                     keysTextarea.css('height', keysTextarea[0].scrollHeight + 10 + 'px');
                 }, 0);
@@ -516,28 +456,24 @@ $(document).ready(function()
 
             $('#register_btn').removeAttr('href');
             $('#register_btn').attr('style', 'width:104px;text-align:center;');
-            $('#register_btn').click(function(){initializeKeysRegistration();});
+            $('#register_btn').click(function () { initializeKeysRegistration(); });
             $('#register_btn').after('<a class="btnv6_blue_hoverfade btn_medium" id="settings_btn" style="margin-top:5px;width:104px;text-align:center;"><span>Settings</span></a>');
 
             $('.responsive_page_frame.with_header').after(settingsModal);
 
             let settings_ok = true;
 
-            try
-            {
+            try {
                 let _settings = JSON.parse(window.localStorage.getItem('bka_settings'));
 
-                if(_settings != null)
-                {
+                if (_settings != null) {
                     settings = _settings;
                 }
-                else
-                {
+                else {
                     throw 'null';
                 }
             }
-            catch(e)
-            {
+            catch (e) {
                 settings_ok = false;
 
                 console.log(e);
@@ -552,33 +488,29 @@ $(document).ready(function()
 
             timestamp = parseInt(window.localStorage.getItem('bka_timestamp')) || 0;
 
-            if(!settings_ok)
-            {
+            if (!settings_ok) {
                 alert('Warning! The script has been updated and it wasn\'t able to find/read setting values. Please review your current preferences, otherwise default set up will be used');
-                
+
                 openSettings();
                 //$('#ModalBlock').css('display', 'block');
             }
 
-            $('#settings_btn').click(function(){openSettings();});
-            $('.newmodal_close').click(function(){saveSettings();$('#ModalBlock').css('display', 'none');});
+            $('#settings_btn').click(function () { openSettings(); });
+            $('.newmodal_close').click(function () { saveSettings(); $('#ModalBlock').css('display', 'none'); });
 
-            if(settings.auto_agree)
-            {
+            if (settings.auto_agree) {
                 $('#accept_ssa').prop('checked', true);//You agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
             }
 
             logDisplay = $('#error_display');
             logDisplay.css('max-height', '400px');
-            logDisplay.css('overflow','auto');
+            logDisplay.css('overflow', 'auto');
             logDisplay.css('background-color', 'rgba(255, 255, 255, 0.3)');
             logDisplay.css('display', 'none');
             logDisplay.css('transition', 'all 3s ease');
 
-            if(location.href.match(/auto=./))
-            {
-                if(location.href.split('auto=')[1].split('&')[0] == '1')
-                {
+            if (location.href.match(/auto=./)) {
+                if (location.href.split('auto=')[1].split('&')[0] == '1') {
                     $('#accept_ssa').prop('checked', true);//If you use auto, you agree to the terms of the SSA https://store.steampowered.com/checkout/ssapopup
                     logDisplay.css('display', 'inherit');
                     keys = keysTextarea.val().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
@@ -596,39 +528,31 @@ $(document).ready(function()
 //                         Processing Bundle Sites
 //================================================================================
 
-function Bundle_ProcessKeys()
-{
+function Bundle_ProcessKeys() {
     var wnd = window.open('https://store.steampowered.com/account/registerkey?keys=' + keysData.join() + (settings.auto_activate ? '&auto=1' : ''));
 
-    try
-    {
+    try {
         wnd.focus();
     }
-    catch(e)
-    {
+    catch (e) {
         alert("Pop-up blocker is enabled! The script won't be able to redirect you to Steam until you have the Pop-up blocker enabled for this site!");
     }
 }
 
-function groupBundlesProcess()
-{
+function groupBundlesProcess() {
     var isIG = false;
 
-    if($('.reservation-lbl').text() != 'reservation')
-    {
+    if ($('.reservation-lbl').text() != 'reservation') {
         var ActivateWhatText = '';
 
-        if($('table').length)
+        if ($('table').length)
             ActivateWhatText = 'Register All the Keys on Steam';
-        else
-        {
-            if($('p').eq(0).text().match(/indiegala.com/gi))
-            {
+        else {
+            if ($('p').eq(0).text().match(/indiegala.com/gi)) {
                 ActivateWhatText = 'Unlock Gift on IndieGala';
                 isIG = true;
             }
-            else
-            {
+            else {
                 ActivateWhatText = 'Register the Key on Steam';
             }
         }
@@ -636,30 +560,24 @@ function groupBundlesProcess()
         $('.reservation-lbl').after('<br><div id="RegisterKeysGB" class="ui button blue compact"><span>' + ActivateWhatText + '</span></div>');
     }
 
-    $('#RegisterKeysGB').click(function(){
-        if(isIG)
-        {
+    $('#RegisterKeysGB').click(function () {
+        if (isIG) {
             var ig_link = $('p').eq(0).text().replace(' | ', '&p=');
 
             var wnd = window.open(ig_link.match(/https?:\/\//) ? ig_link : 'https://' + ig_link);
 
-            try
-            {
+            try {
                 wnd.focus();
             }
-            catch(e)
-            {
+            catch (e) {
                 alert("Pop-up Blocker is enabled! The script won't be able to redirect you to IndieGala until you have the Pop-up blocker enabled for this site!");
             }
         }
-        else
-        {
-            if($('table').length)
-            {
+        else {
+            if ($('table').length) {
                 keysData = $('table td').text().match(/[A-z0-9]{5}(?:(?:-[A-z0-9]{5}){4}|(?:-[A-z0-9]{5}){2})/gi);
             }
-            else
-            {
+            else {
                 keysData.push($('p').eq(0).text());
             }
 
@@ -670,39 +588,32 @@ function groupBundlesProcess()
 
 var IG_Codes = [];
 
-function indieGalaProcess()
-{
-    if(location.href.toLowerCase().includes('indiegala.com/gift'))
-    {
+function indieGalaProcess() {
+    if (location.href.toLowerCase().includes('indiegala.com/gift')) {
         IndieGalaGiftProcess();
     }
-    else
-    {
+    else {
         $('#steam-account').append('<a id="RegisterKeysIndieGala" href="javascript://"><i class="fa fa-steam-square"></i> Register All the Bundle Keys on Steam</a>');
-        $('#RegisterKeysIndieGala').click(function(){
+        $('#RegisterKeysIndieGala').click(function () {
 
             $('#RegisterKeysIndieGala').contents().last().replaceWith(' Processing...');
 
             //Make sure that we're getting codes from an opened bundle
             var fetchlinks = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=fetchlink_]');
-            for(var i = 0; i < fetchlinks.length; i++)
-            {
+            for (var i = 0; i < fetchlinks.length; i++) {
                 IG_Codes.push(fetchlinks.eq(i).attr('id').split('_')[1]);
             }
 
             var serials = $('[id*=current_sale_].panel-collapse.collapse.in').find('div[id*=serial_]');
-            for(i = 0; i < serials.length; i++)
-            {
+            for (i = 0; i < serials.length; i++) {
                 IG_Codes.push(serials.eq(i).attr('id').split('_')[1]);
             }
 
-            if(IG_Codes.length > 0)
-            {
+            if (IG_Codes.length > 0) {
                 console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', consoleCSS);
                 IndieGalaFetchKey(0);
             }
-            else
-            {
+            else {
                 $('#RegisterKeysIndieGala').contents().last().replaceWith(' Register All the Bundle Keys on Steam');
                 alert('No keys found! It seems you don\'t have any bundle opened!');
             }
@@ -710,115 +621,100 @@ function indieGalaProcess()
     }
 }
 
-function IndieGalaGiftProcess()
-{
+function IndieGalaGiftProcess() {
     var href = location.href;
-    if(href.match(/&p=./))
-    {
+    if (href.match(/&p=./)) {
         var gift_password = href.split('p=')[1];
 
         //took some pieces from indiegala default scripts
         var data_to_send = {};
-		data_to_send.gift_id = $( '#gift-validation-id' ).val();
-		data_to_send.gift_token = $( '#gift-validation-token' ).val();
-		data_to_send.gift_password = gift_password;
+        data_to_send.gift_id = $('#gift-validation-id').val();
+        data_to_send.gift_token = $('#gift-validation-token').val();
+        data_to_send.gift_password = gift_password;
 
         $.ajax(
-        {
-			type: 'POST',
-			url: '/gift/verify',
-			data: JSON.stringify( data_to_send ),
-			dataType: 'json',
-			success: function(response_data){
-				if ( response_data.status == 200 )
-                {
-					$('#gift-contents').append(response_data.contents)
-					$( '.gift-contents-password-cont' ).slideUp(function(){ $('#gift-contents').slideDown() });
+            {
+                type: 'POST',
+                url: '/gift/verify',
+                data: JSON.stringify(data_to_send),
+                dataType: 'json',
+                success: function (response_data) {
+                    if (response_data.status == 200) {
+                        $('#gift-contents').append(response_data.contents)
+                        $('.gift-contents-password-cont').slideUp(function () { $('#gift-contents').slideDown() });
 
-                    $('#steam-key-games').after('<button id="RegisterKeysIndieGala" href="javascript://" class="icon-string order-button-profile" style="width:300px"><div class="fa fa-steam-square" style="margin-right:10px"></div><span> Register All the Bundle Keys on Steam</span></button>');
+                        $('#steam-key-games').after('<button id="RegisterKeysIndieGala" href="javascript://" class="icon-string order-button-profile" style="width:300px"><div class="fa fa-steam-square" style="margin-right:10px"></div><span> Register All the Bundle Keys on Steam</span></button>');
 
-                    $('#RegisterKeysIndieGala').click(function(){
-                        $('#RegisterKeysIndieGala span').text(' Processing...');
+                        $('#RegisterKeysIndieGala').click(function () {
+                            $('#RegisterKeysIndieGala span').text(' Processing...');
 
-                        var fetchlinks = $('[id*=fetching_]');
-                        for(var i = 0; i < fetchlinks.length; i++)
-                        {
-                            IG_Codes.push(fetchlinks.eq(i).attr('id').split('_')[1]);
-                        }
-
-                        var serials = $('[id*=serial_n_]');
-                        for(i = 0; i < serials.length; i++)
-                        {
-                            keysData.push(serials.eq(i).val());
-                        }
-
-                        if(IG_Codes.length > 0 || keysData.length > 0)
-                        {
-                            if(IG_Codes.length == 0)
-                            {
-                                $('#RegisterKeysIndieGala span').text(' Done! Redirecting to Steam...');
-                                Bundle_ProcessKeys();
+                            var fetchlinks = $('[id*=fetching_]');
+                            for (var i = 0; i < fetchlinks.length; i++) {
+                                IG_Codes.push(fetchlinks.eq(i).attr('id').split('_')[1]);
                             }
-                            else
-                            {
-                                console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', consoleCSS);
-                                IndieGalaFetchKey(0);
+
+                            var serials = $('[id*=serial_n_]');
+                            for (i = 0; i < serials.length; i++) {
+                                keysData.push(serials.eq(i).val());
                             }
-                        }
-                        else
-                        {
-                            $('#RegisterKeysIndieGala span').text(' Register All the Bundle Keys on Steam');
-                            alert('No keys found! Something went wrong!');
-                        }
-                    });
-                }
-                else
-                {
-                    handleValidationMessage(response_data.status);
-                }
-			},
-			error: function(jqXHR, textStatus, errorThrown){
-				handleValidationMessage('');
-			},
-			complete: function(){
-				$this.removeClass('disabled');
-			},
-		});
+
+                            if (IG_Codes.length > 0 || keysData.length > 0) {
+                                if (IG_Codes.length == 0) {
+                                    $('#RegisterKeysIndieGala span').text(' Done! Redirecting to Steam...');
+                                    Bundle_ProcessKeys();
+                                }
+                                else {
+                                    console.log('%c Batch Keys Activator | ' + IG_Codes.length + ' codes collected. Fetching Steam Keys... ', consoleCSS);
+                                    IndieGalaFetchKey(0);
+                                }
+                            }
+                            else {
+                                $('#RegisterKeysIndieGala span').text(' Register All the Bundle Keys on Steam');
+                                alert('No keys found! Something went wrong!');
+                            }
+                        });
+                    }
+                    else {
+                        handleValidationMessage(response_data.status);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    handleValidationMessage('');
+                },
+                complete: function () {
+                    $this.removeClass('disabled');
+                },
+            });
 
     }
 
 }
 
-function IndieGalaFetchKey(i)
-{
-    if(i < IG_Codes.length)
-    {
+function IndieGalaFetchKey(i) {
+    if (i < IG_Codes.length) {
         $('#RegisterKeysIndieGala').contents().last().replaceWith(' Processing... Code: ' + i + '\\' + IG_Codes.length);
 
-        $.get('https://www.indiegala.com/myserials/syncget?code=' + IG_Codes[i], function(data){
+        $.get('https://www.indiegala.com/myserials/syncget?code=' + IG_Codes[i], function (data) {
             keysData.push($.parseJSON(data).serial_number);
             IndieGalaFetchKey(++i);
-        }).fail(function(data){
+        }).fail(function (data) {
             alert('Error fetching keys!');
             return;
         });
     }
-    else
-    {
+    else {
         $('#RegisterKeysIndieGala').contents().last().replaceWith(' Done! Redirecting to Steam...');
         Bundle_ProcessKeys();
     }
 }
 
-function otakuGogoProcess()
-{
+function otakuGogoProcess() {
     var keys_table = $('.hikashop_order_main_table tbody tr td fieldset table tbody').eq(1).find('tr td');
 
     $('.hikashop_order_main_table tbody tr td fieldset legend').eq(2).before('<div href="javascript://" id="ActivateKeys" class="btn">Fetch and Activate All the Keys on Steam</div>');
 
-    $('#ActivateKeys').click(function(){
-        for(var i = 1; i < keys_table.length; i+=4)
-        {
+    $('#ActivateKeys').click(function () {
+        for (var i = 1; i < keys_table.length; i += 4) {
             keysData.push(keys_table.eq(i).text());
         }
 
@@ -826,28 +722,25 @@ function otakuGogoProcess()
     });
 }
 
-function fanaticalProcess()
-{
-    setTimeout(function(){
+function fanaticalProcess() {
+    setTimeout(function () {
         $('.account-content').find('h3').after('<button type="button" id="activate" class="btn btn-secondary btn-block">Fetch and Activate All the Keys on Steam</button>');
-        $('#activate').click(function(){
+        $('#activate').click(function () {
             var reveal = $('.account-content').find('dl [type=button].btn.btn-secondary.btn-block');
 
-            for (var i = 0; i < reveal.length; i++)
-            {
+            for (var i = 0; i < reveal.length; i++) {
                 $('#activate').text('Fetching keys ' + i + '\\' + reveal.length);
                 reveal.eq(i).click();
             }
 
             $('#activate').text('Fetching keys... Done!');
 
-            setTimeout(function(){
+            setTimeout(function () {
                 $('#activate').text('Processing keys...');
 
                 var data = $('input[type=text].text-center.font-weight-bold.form-control');
 
-                for (var j = 0; j < data.length; j++)
-                {
+                for (var j = 0; j < data.length; j++) {
                     keysData.push(data.eq(j).attr('value'));
                 }
 
@@ -859,22 +752,21 @@ function fanaticalProcess()
     }, 1500);
 }
 
-function humbleBundleProcess()
-{
-    setTimeout(function(){
+function humbleBundleProcess() {
+    setTimeout(function () {
         $('.key-list').before('<div id="ActivateOnSteam" class="round-active-button">Redeem and Activate the Keys on Steam</a>');
 
-        $('#ActivateOnSteam').click(function(){
+        $('#ActivateOnSteam').click(function () {
             $('#ActivateOnSteam').text('Redeeming...');
 
-            $('.keyfield-value').each(function(){
+            $('.keyfield-value').each(function () {
                 $(this).click();
             });
 
-            setTimeout(function(){
+            setTimeout(function () {
                 $('#ActivateOnSteam').text('Fetching...');
 
-                $('.keyfield.redeemed').each(function(){
+                $('.keyfield.redeemed').each(function () {
                     keysData.push($(this).attr('title'));
                 });
 
