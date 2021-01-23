@@ -4,7 +4,7 @@
 
 ### Open script's folder for descriptions and guides
 
-# If you want to support it, feel free to do so [on my Ko-fi](https://ko-fi.com/xeox_ceo), [Patreon](https://www.patreon.com/zeokku)
+# If you want to support it, feel free to do so [on Ko-fi](https://ko-fi.com/zeokku), [Patreon](https://www.patreon.com/zeokku)
 
 ## Direct Install Links:
 * [Consume Knick-Knacks [1.1]](https://github.com/LiteOnE/Steam-Scripts/raw/master/Consume-Knick-Knacks/Consume-Knick-Knacks.user.js)
