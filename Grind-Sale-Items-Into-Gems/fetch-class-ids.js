@@ -11,7 +11,7 @@ const seasons = {
 let query_params = {
     class: classes.bg,
     year: 2019,
-    season = seasons.winter
+    season: seasons.winter
 }
 
 let fetch_link = `https://steamcommunity.com/market/search/render/?query=&start=0&count=100&search_descriptions=0&sort_column=name&sort_dir=asc&appid=753&category_753_Game[]=any&category_753_Event[]=tag_${query_params.season}${query_params.year}&category_753_item_class[]=tag_item_class_${query_params.class}`;
