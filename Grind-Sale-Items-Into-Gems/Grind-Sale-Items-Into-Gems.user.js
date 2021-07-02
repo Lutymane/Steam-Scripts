@@ -161,7 +161,7 @@ function GrindAssetID(i = 0) {
                     'OK', 'Close', 'Made by Luty').done(
                         btn_type => {
                             if (btn_type == 'SECONDARY') {
-                                location.href = 'https://steamcommunity.com/profiles/76561198112259429';
+                                location.href = 'https://github.com/Lutymane';
                             }
                         }
                     );
