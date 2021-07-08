@@ -2,7 +2,7 @@
 // @name         Grind Sale Items Into Gems
 // @icon         https://store.steampowered.com/favicon.ico
 // @namespace    steam
-// @version      2.4.1
+// @version      2.4.2
 // @description  Choose how many and what sale items you want to grind into gems in few clicks
 // @author       Lutymane
 // @match        https://steamcommunity.com/*/*/inventory*
@@ -289,9 +289,7 @@ $J(() => {
             'Check Items', 'Exit'
         ).done(
             () => {
-                let offset_year = +Object.keys(classid_db)[0];
-
-                let db = classid_db[offset_year + year.prop('selectedIndex')][season.val()];
+                let db = classid_db[year.val()][season.val()];
 
                 if (db === null) {
                     ShowAlertDialog("Hold up!", "This event didn't have any grindable items!");
